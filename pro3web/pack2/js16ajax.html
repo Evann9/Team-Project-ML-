@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        window.onload = () => {
+            document.querySelector('#btnGet').onclick = getFunc;
+            document.querySelector('#btnPost').onclick = postFunc;
+        }
+
+        let xhr;
+
+        function getFunc(){
+            let irum = frm.name.value;
+            let nai = frm.age.value;
+            // alert(irum + ' ' + nai)
+
+            xhr = new XMLHttpRequest();  // 서버와 Ajax 통신 클래스
+            let fname = 'js.py?irum=' + irum + '&nai=' + nai;
+            xhr.open('GET',fname, true)
+            xhr.onreadystatechange = function(){
+                if(xhr.readyState === 4 && xhr.status === 200){
+                    process1();
+                }
+            }
+            xhr.send();
+        }
+
+        function process1(){
+            alert(xhr.responseText);
+
+        }
+
+        function postFunc(){
+
+        }
+    </script>
+</head>
+<body>
+    <h2>Ajax 이해 : get, post</h2>
+    <form name="frm">
+        이름: <input type="text" name="name" value="tom"><br>
+        나이: <input type="text" name="age" value="33"><br>
+        <input type="button" value="get 방식" id="btnGet">
+        <input type="button" value="post 방식" id="btnPost">
+    </form>
+</body>
+</html>
