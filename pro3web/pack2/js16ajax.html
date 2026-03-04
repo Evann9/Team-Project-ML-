@@ -18,7 +18,9 @@
             // alert(irum + ' ' + nai)
 
             xhr = new XMLHttpRequest();  // 서버와 Ajax 통신 클래스
-            let fname = 'js.py?irum=' + irum + '&nai=' + nai;
+            let fname = 'js16.py?irum=' + irum + '&nai=' + nai;
+            // 임시방편용 js16.py 작성(얘는 처리 후 json을 반환한다고 가정)
+
             xhr.open('GET',fname, true)
             xhr.onreadystatechange = function(){
                 if(xhr.readyState === 4 && xhr.status === 200){
@@ -34,6 +36,21 @@
         }
 
         function postFunc(){
+            let irum = frm.name.value;
+            let nai = frm.age.value;
+            // alert(irum + ' ' + nai)
+
+            xhr = new XMLHttpRequest();  // 서버와 Ajax 통신 클래스
+            let fname = 'js16.py';
+
+            xhr.open('POST',fname, true)
+            xhr.onreadystatechange = function(){
+                if(xhr.readyState === 4 && xhr.status === 200){
+                    process1();
+                }
+            }
+            xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded")
+            xhr.send('irum=' + irum + '&nai=' + nai); // body 영역에 포함되어 전송(대용량)
 
         }
     </script>
