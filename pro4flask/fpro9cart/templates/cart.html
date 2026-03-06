@@ -6,10 +6,8 @@
     <tr>
         <th>상품명</th><th>가격</th><th>수량</th><th>합계</th><th>삭제</th>
     </tr>
-    {% set total = 0 %}
     {% for name, info in cart.items() %}
         {% set subtotal = info.price * info.qty %}
-        {% set total = total + subtotal %}
         <tr>
             <td>{{name}}</td>
             <td>{{info.price}}</td>
@@ -19,6 +17,7 @@
         </tr>
     {% endfor %}
 </table>
+<p><b>총금액 : {{total}}원</b></p>
 <a href="/clear">장바구니 비우기</a>
 {% else %}
 <p>장바구니가 비었습니다</p>
