@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>직원 전체 자료</h2>
+    <p>로그인 사용자: <b>{{login_user.jikwonname}}</b>({{login_user.jikwonno}})</p>
+
+    <table border="1">
+        <tr>
+            <td>직번</td><td>직원명</td><td>부서명</td><td>직급</td><td>연봉</td><td>입사년</td>
+        </tr>
+        {% for r in rows %}
+        <tr>
+            <td>{{r.jikwonno}}
+                <a href="{{url_for('gogek_list', jikwonno=r.jikwonno)}}">{{r.jikwonname}}</a></td>
+            <td>{{r.jikwonname}}</td>
+            <td>{{r.busername}}</td>
+            <td>{{r.jikwonjik}}</td>
+            <td>{{r.jikwonpay}}</td>
+            <td>{{r.jikwonibsail_year}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <form action="{{url_for('logout')}}" method="post">
+        <button type="submit">로그아웃</button>
+    </form>
+</body>
+</html>
