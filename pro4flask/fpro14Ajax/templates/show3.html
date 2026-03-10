@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <button id="loadBtn">상품 자료 읽기(axios)</button>
+    <table id="resultTable">
+    </table>
+
+    <script>
+        document.getElementById('loadBtn').addEventListener("click", loadData);
+
+        async function loadData(){
+            try{
+                const response = await axios.get("/api/sangdata");
+                const data = response.data;
+
+                const table = document.getElementById("resultTable");
+                table.innerHTML = "";
+                if(data.length === 0){
+                    table.innerHTML = "<tr><td>자료없음</td></tr>";
+                    return;
+                }
+
+                let headerRow = "<tr>";
+                    Object.keys(data[0]).forEach(key =>{
+                        headerRow += `<th>${key}</th>`;
+                    });
+                headerRow += "</tr>";
+                table.innerHTML = headerRow;
+
+                // 자료 채우기 (오타 수정 위치)
+                data.forEach(row => {
+                    let lowHtml = "<tr>"
+                        Object.values(row).forEach(value => {
+                            lowHtml += `<td>${value}</td>`
+                        });
+                    lowHtml += "</tr>"; // 1. '=' 를 '+=' 로 수정 (내용 유지)
+                    table.innerHTML += lowHtml; // 2. '=' 를 '+=' 로 수정 (행 누적)
+                });
+
+            } catch(error) { // 3. async 구조에 맞춰 catch 블록 연결
+                alert("에러 : " + error)
+            }
+        } // 4. 괄호 오타 정리
+    </script>
+</body>
+</html>
