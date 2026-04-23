@@ -18,7 +18,7 @@ numeric_cols = [col for col in numeric_cols if col in df.columns]
 
 # 2. 히스토그램
 df[numeric_cols].hist(bins=30, figsize=(10, 8))
-plt.suptitle("Passenger Numeric Feature Distributions")
+plt.suptitle("Military Numeric Feature Distributions")
 plt.tight_layout()
 plt.show()
 
