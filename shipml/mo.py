@@ -5,6 +5,9 @@ import numpy as np
 # 1. 데이터 로드
 df = pd.read_csv("ais_data_ultra_cleaned.csv")
 
+# 2. Heading 결측치를 COG 값으로 대체
+df['heading'] = df['heading'].fillna(df['cog'])
+
 # 2. 각도(Degree)를 라디안(Radian)으로 변환 후 Sin/Cos 계산 함수
 def transform_angles(df, column):
     # 0~360도 범위를 라디안으로 변환
