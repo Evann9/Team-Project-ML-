@@ -1,3 +1,5 @@
+# SVC 모델 - 너무 느려서 안돌아감
+
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer

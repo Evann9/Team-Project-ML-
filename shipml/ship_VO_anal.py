@@ -1,3 +1,5 @@
+# Voting 모델
+
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier, VotingClassifier
@@ -85,42 +87,43 @@ preprocessor = ColumnTransformer(
     ]
 )
 
-ensemble_classifier = VotingClassifier(
-    estimators=[
-        (
-            "lr",
-            LogisticRegression(
-                max_iter=2000,
-                class_weight="balanced",
-            ),
-        ),
-        (
-            "rf",
-            RandomForestClassifier(
-                n_estimators=200,
-                random_state=42,
-                n_jobs=-1,
-                class_weight="balanced",
-            ),
-        ),
-        (
-            "et",
-            ExtraTreesClassifier(
-                n_estimators=200,
-                random_state=42,
-                n_jobs=-1,
-                class_weight="balanced",
-            ),
-        ),
-    ],
-    voting="soft",
-    n_jobs=1,
-)
-
 model = Pipeline(
     steps=[
         ("preprocessor", preprocessor),
-        ("classifier", ensemble_classifier),
+        (
+            "classifier",
+            VotingClassifier(
+                estimators=[
+                    (
+                        "lr",
+                        LogisticRegression(
+                            max_iter=2000,
+                            class_weight="balanced",
+                        ),
+                    ),
+                    (
+                        "rf",
+                        RandomForestClassifier(
+                            n_estimators=200,
+                            random_state=42,
+                            n_jobs=-1,
+                            class_weight="balanced",
+                        ),
+                    ),
+                    (
+                        "et",
+                        ExtraTreesClassifier(
+                            n_estimators=200,
+                            random_state=42,
+                            n_jobs=-1,
+                            class_weight="balanced",
+                        ),
+                    ),
+                ],
+                voting="soft",
+                n_jobs=1,
+            ),
+        ),
     ]
 )
 
@@ -137,12 +140,48 @@ print("\ntrain accuracy:", train_acc)
 print("test accuracy:", test_acc)
 print("macro f1:", report["macro avg"]["f1-score"])
 print("weighted f1:", report["weighted avg"]["f1-score"])
+# train accuracy: 0.9999957447894947
+# test accuracy: 0.9641884531590414
+# macro f1: 0.9499696517032737
+# weighted f1: 0.9637415880404236
 
 print("\nclassification report:")
 print(classification_report(y_test, test_pred))
+# classification report:
+#                  precision    recall  f1-score   support
+
+#           Cargo       0.95      0.99      0.97     34389
+#        Dredging       0.98      0.94      0.96       795
+#         Fishing       1.00      0.99      1.00      2585
+#             HSC       0.99      0.97      0.98       740
+# Law enforcement       0.98      0.94      0.96       320
+#        Military       0.98      0.99      0.99       865
+#       Passenger       0.99      0.98      0.99      1928
+#           Pilot       1.00      1.00      1.00       395
+#        Pleasure       0.82      0.90      0.86        20
+#             SAR       0.94      0.93      0.94       101
+#         Sailing       0.82      0.78      0.80        36
+#          Tanker       0.98      0.89      0.93     14859
+#          Towing       0.96      0.92      0.94       186
+#             Tug       0.99      1.00      0.99      1533
+
+#        accuracy                           0.96     58752
+#       macro avg       0.96      0.95      0.95     58752
+#    weighted avg       0.96      0.96      0.96     58752
 
 labels = sorted(y.unique())
 cm = confusion_matrix(y_test, test_pred, labels=labels)
 cm_df = pd.DataFrame(cm, index=labels, columns=labels)
 
 print_top_confusion_pairs(cm_df)
+# top 10 confusion pairs:
+# Tanker -> Cargo: 1622
+# Cargo -> Tanker: 269
+# Dredging -> Cargo: 39
+# Passenger -> Cargo: 30
+# Cargo -> Passenger: 14
+# Towing -> Tug: 14
+# Fishing -> Cargo: 11
+# HSC -> Cargo: 11
+# Cargo -> Dredging: 8
+# Law enforcement -> Military: 6

@@ -1,3 +1,5 @@
+# LogisticRegression 모델
+
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
