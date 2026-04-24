@@ -1,0 +1,19 @@
+
+route_center_lines.geojson
+예측된 대표 경로 12개를 선(LineString)으로 표시
+
+anchorage_clusters.geojson
+정박지 후보 163개 포인트
+
+route_prediction_endpoints.geojson
+선박별 예측 결과의 도착점
+
+route_prediction_startpoints.geojson
+선박별 시작점
+
+anomaly_ship_endpoints.geojson
+이상 선박 174척의 도착점
+
+anomaly_track_lines.geojson
+이상 선박 174척의 실제 AIS 이동 궤적
+

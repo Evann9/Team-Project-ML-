@@ -1,0 +1,10 @@
+
+route_predictions.csv: 선박별 예측 경로, 확률, 이상 여부, 정박지 예측
+
+anomaly_ships.csv: 이상 선박만 모은 파일
+
+anchorage_predictions.csv: 선박별 정박지 예측
+
+anchorage_clusters.csv: 정박지 후보 좌표
+
+run_summary.json: 실행 요약
