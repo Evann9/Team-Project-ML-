@@ -1,0 +1,2783 @@
+{
+  "type": "FeatureCollection",
+  "name": "anchorage_clusters",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.842623786454004,
+          57.6609028220576
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_013",
+        "event_count": 412,
+        "vessel_count": 217,
+        "mean_duration_hours": 31.79126213592233,
+        "total_stop_points": 13229
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.603166847624228,
+          57.70245397308669
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_018",
+        "event_count": 339,
+        "vessel_count": 193,
+        "mean_duration_hours": 40.33628318584071,
+        "total_stop_points": 13785
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.611858919031532,
+          55.6960084427928
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_005",
+        "event_count": 207,
+        "vessel_count": 108,
+        "mean_duration_hours": 63.99516908212561,
+        "total_stop_points": 13320
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.433565617789089,
+          55.46781469590185
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_003",
+        "event_count": 183,
+        "vessel_count": 116,
+        "mean_duration_hours": 83.59016393442623,
+        "total_stop_points": 15324
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.961012352848686,
+          57.59301078126156
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_066",
+        "event_count": 143,
+        "vessel_count": 83,
+        "mean_duration_hours": 74.9090909090909,
+        "total_stop_points": 10812
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.221514762673044,
+          56.69698296925896
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_002",
+        "event_count": 118,
+        "vessel_count": 73,
+        "mean_duration_hours": 82.57627118644068,
+        "total_stop_points": 9824
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.101105711852862,
+          54.15790260967302
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_030",
+        "event_count": 116,
+        "vessel_count": 70,
+        "mean_duration_hours": 24.86206896551724,
+        "total_stop_points": 2936
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.66171786045905,
+          57.7060626411059
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_128",
+        "event_count": 101,
+        "vessel_count": 35,
+        "mean_duration_hours": 37.07920792079208,
+        "total_stop_points": 3834
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.22539560644728,
+          56.151370215580926
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_014",
+        "event_count": 100,
+        "vessel_count": 58,
+        "mean_duration_hours": 44.37,
+        "total_stop_points": 4467
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.367170236543908,
+          54.64094662503218
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_001",
+        "event_count": 93,
+        "vessel_count": 40,
+        "mean_duration_hours": 84.39784946236558,
+        "total_stop_points": 7766
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.598549033846517,
+          57.121492665178046
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_061",
+        "event_count": 92,
+        "vessel_count": 70,
+        "mean_duration_hours": 91.6413043478261,
+        "total_stop_points": 8509
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.924791651026956,
+          56.41166588100128
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_020",
+        "event_count": 85,
+        "vessel_count": 56,
+        "mean_duration_hours": 91.18823529411765,
+        "total_stop_points": 7790
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.153914469777776,
+          54.35458708533333
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_008",
+        "event_count": 76,
+        "vessel_count": 72,
+        "mean_duration_hours": 14.11842105263158,
+        "total_stop_points": 1125
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.715655618858278,
+          56.01532834706049
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_025",
+        "event_count": 73,
+        "vessel_count": 40,
+        "mean_duration_hours": 47.945205479452056,
+        "total_stop_points": 3521
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.012787006410257,
+          55.6226336954023
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_010",
+        "event_count": 65,
+        "vessel_count": 38,
+        "mean_duration_hours": 34.53846153846154,
+        "total_stop_points": 2262
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.118744908263649,
+          54.83189279193309
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_054",
+        "event_count": 63,
+        "vessel_count": 20,
+        "mean_duration_hours": 32.12698412698413,
+        "total_stop_points": 2033
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.125310248574145,
+          56.00224435513306
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_087",
+        "event_count": 55,
+        "vessel_count": 39,
+        "mean_duration_hours": 95.21818181818182,
+        "total_stop_points": 5260
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.541066195079951,
+          57.43611258007379
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_076",
+        "event_count": 51,
+        "vessel_count": 39,
+        "mean_duration_hours": 79.09803921568627,
+        "total_stop_points": 4065
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.505153926702349,
+          57.49244408920606
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_071",
+        "event_count": 50,
+        "vessel_count": 29,
+        "mean_duration_hours": 66.34,
+        "total_stop_points": 3363
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.126654113554634,
+          57.321270230982016
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_077",
+        "event_count": 50,
+        "vessel_count": 23,
+        "mean_duration_hours": 71.3,
+        "total_stop_points": 3615
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.097358335035524,
+          55.67474718561279
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_015",
+        "event_count": 49,
+        "vessel_count": 26,
+        "mean_duration_hours": 45.67346938775511,
+        "total_stop_points": 2252
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.790102273734176,
+          57.59414117563291
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_052",
+        "event_count": 48,
+        "vessel_count": 14,
+        "mean_duration_hours": 38.6875,
+        "total_stop_points": 1896
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.92785868844697,
+          54.57212092171717
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_060",
+        "event_count": 48,
+        "vessel_count": 10,
+        "mean_duration_hours": 32.770833333333336,
+        "total_stop_points": 1584
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.833899873104547,
+          54.93364624900238
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_098",
+        "event_count": 48,
+        "vessel_count": 7,
+        "mean_duration_hours": 26.3125,
+        "total_stop_points": 1253
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.294702672086721,
+          54.75868224661246
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_047",
+        "event_count": 47,
+        "vessel_count": 6,
+        "mean_duration_hours": 22.595744680851062,
+        "total_stop_points": 1107
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.9143662278481,
+          57.05853723316456
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_016",
+        "event_count": 42,
+        "vessel_count": 34,
+        "mean_duration_hours": 93.45238095238096,
+        "total_stop_points": 3950
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.692940593363929,
+          55.09676789551712
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_028",
+        "event_count": 42,
+        "vessel_count": 29,
+        "mean_duration_hours": 66.9047619047619,
+        "total_stop_points": 2833
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.130996372488124,
+          55.33177362257946
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_019",
+        "event_count": 41,
+        "vessel_count": 25,
+        "mean_duration_hours": 67.63414634146342,
+        "total_stop_points": 2737
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.148662311212814,
+          55.36983676201373
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_007",
+        "event_count": 38,
+        "vessel_count": 11,
+        "mean_duration_hours": 10.526315789473683,
+        "total_stop_points": 437
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.312449231406044,
+          56.12593020367936
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_097",
+        "event_count": 37,
+        "vessel_count": 25,
+        "mean_duration_hours": 101.89189189189187,
+        "total_stop_points": 3805
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.567603059976932,
+          55.08712006286044
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_012",
+        "event_count": 37,
+        "vessel_count": 15,
+        "mean_duration_hours": 45.972972972972975,
+        "total_stop_points": 1734
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.57429044031311,
+          54.69295555479453
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_043",
+        "event_count": 37,
+        "vessel_count": 8,
+        "mean_duration_hours": 26.97297297297297,
+        "total_stop_points": 1022
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.831210731130492,
+          55.86302893827575
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_011",
+        "event_count": 35,
+        "vessel_count": 29,
+        "mean_duration_hours": 84.62857142857143,
+        "total_stop_points": 2981
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.845551922283068,
+          55.963155359309184
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_055",
+        "event_count": 32,
+        "vessel_count": 18,
+        "mean_duration_hours": 73.1875,
+        "total_stop_points": 2374
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.368564468390804,
+          55.97242583169129
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_110",
+        "event_count": 32,
+        "vessel_count": 6,
+        "mean_duration_hours": 37.9375,
+        "total_stop_points": 1218
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.23796937182448,
+          55.094053396073896
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_069",
+        "event_count": 30,
+        "vessel_count": 9,
+        "mean_duration_hours": 27.966666666666665,
+        "total_stop_points": 866
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.692931783116885,
+          54.51367943636363
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_045",
+        "event_count": 30,
+        "vessel_count": 3,
+        "mean_duration_hours": 12.0,
+        "total_stop_points": 385
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.618183411809582,
+          55.05900837412267
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_084",
+        "event_count": 29,
+        "vessel_count": 20,
+        "mean_duration_hours": 112.34482758620688,
+        "total_stop_points": 3277
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.199049792517007,
+          55.46214996307094
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_065",
+        "event_count": 29,
+        "vessel_count": 18,
+        "mean_duration_hours": 34.6551724137931,
+        "total_stop_points": 1029
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.888200681303116,
+          55.26948348441926
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_023",
+        "event_count": 29,
+        "vessel_count": 10,
+        "mean_duration_hours": 23.655172413793103,
+        "total_stop_points": 706
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.67845225286807,
+          55.59763996940727
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_099",
+        "event_count": 29,
+        "vessel_count": 6,
+        "mean_duration_hours": 36.75862068965517,
+        "total_stop_points": 1046
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.743523289075174,
+          55.55613262898864
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_073",
+        "event_count": 28,
+        "vessel_count": 19,
+        "mean_duration_hours": 66.53571428571429,
+        "total_stop_points": 1849
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.535505207535389,
+          55.470661302248125
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_004",
+        "event_count": 26,
+        "vessel_count": 20,
+        "mean_duration_hours": 91.76923076923076,
+        "total_stop_points": 2402
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.051282694857916,
+          57.05183235994589
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_006",
+        "event_count": 26,
+        "vessel_count": 18,
+        "mean_duration_hours": 56.03846153846154,
+        "total_stop_points": 1478
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.257354005709624,
+          54.94223877243067
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_053",
+        "event_count": 26,
+        "vessel_count": 6,
+        "mean_duration_hours": 46.23076923076923,
+        "total_stop_points": 1226
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.548636439453125,
+          55.86526959375
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_135",
+        "event_count": 26,
+        "vessel_count": 2,
+        "mean_duration_hours": 8.846153846153847,
+        "total_stop_points": 256
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.308034315857888,
+          56.9908259254766
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_096",
+        "event_count": 25,
+        "vessel_count": 9,
+        "mean_duration_hours": 46.16,
+        "total_stop_points": 1154
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.719989550469483,
+          54.93801070657276
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_119",
+        "event_count": 25,
+        "vessel_count": 4,
+        "mean_duration_hours": 16.28,
+        "total_stop_points": 426
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.25629706200177,
+          55.91049415411869
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_088",
+        "event_count": 24,
+        "vessel_count": 6,
+        "mean_duration_hours": 46.333333333333336,
+        "total_stop_points": 1129
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.924018549043062,
+          57.296517049043054
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_075",
+        "event_count": 24,
+        "vessel_count": 4,
+        "mean_duration_hours": 33.833333333333336,
+        "total_stop_points": 836
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.48891946388102,
+          55.6053199532578
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_029",
+        "event_count": 23,
+        "vessel_count": 11,
+        "mean_duration_hours": 29.956521739130437,
+        "total_stop_points": 706
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.359948009900991,
+          54.9160666930693
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_092",
+        "event_count": 23,
+        "vessel_count": 4,
+        "mean_duration_hours": 3.391304347826087,
+        "total_stop_points": 101
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.734294185175202,
+          56.34776957412399
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_142",
+        "event_count": 22,
+        "vessel_count": 6,
+        "mean_duration_hours": 17.863636363636363,
+        "total_stop_points": 371
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.41273125872093,
+          54.89170221511629
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_083",
+        "event_count": 22,
+        "vessel_count": 2,
+        "mean_duration_hours": 6.818181818181818,
+        "total_stop_points": 172
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.494601443554844,
+          55.49145062369895
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_009",
+        "event_count": 20,
+        "vessel_count": 20,
+        "mean_duration_hours": 61.55,
+        "total_stop_points": 1249
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.65811020228628,
+          57.73644823558648
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_137",
+        "event_count": 20,
+        "vessel_count": 9,
+        "mean_duration_hours": 49.3,
+        "total_stop_points": 1006
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.709491781345566,
+          55.72074410091744
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_113",
+        "event_count": 20,
+        "vessel_count": 4,
+        "mean_duration_hours": 15.45,
+        "total_stop_points": 327
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.27276299659864,
+          55.76233879591836
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_089",
+        "event_count": 20,
+        "vessel_count": 1,
+        "mean_duration_hours": 6.35,
+        "total_stop_points": 147
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.645545598591548,
+          55.80803788732394
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_141",
+        "event_count": 20,
+        "vessel_count": 1,
+        "mean_duration_hours": 6.1,
+        "total_stop_points": 142
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.862217598697397,
+          55.85709990681362
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_091",
+        "event_count": 19,
+        "vessel_count": 15,
+        "mean_duration_hours": 52.8421052631579,
+        "total_stop_points": 998
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.614951381679392,
+          56.03839813587787
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_070",
+        "event_count": 19,
+        "vessel_count": 10,
+        "mean_duration_hours": 34.21052631578947,
+        "total_stop_points": 655
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.120106049698794,
+          56.36871873117471
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_121",
+        "event_count": 19,
+        "vessel_count": 9,
+        "mean_duration_hours": 70.3157894736842,
+        "total_stop_points": 1328
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.466185170253165,
+          56.79299643037975
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_144",
+        "event_count": 19,
+        "vessel_count": 5,
+        "mean_duration_hours": 8.421052631578947,
+        "total_stop_points": 158
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.137553821428574,
+          55.879892857142856
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_080",
+        "event_count": 18,
+        "vessel_count": 1,
+        "mean_duration_hours": 2.888888888888889,
+        "total_stop_points": 70
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.31170933280757,
+          54.53617840063091
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_027",
+        "event_count": 17,
+        "vessel_count": 17,
+        "mean_duration_hours": 17.764705882352942,
+        "total_stop_points": 317
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.804424703765973,
+          55.30055018964357
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_072",
+        "event_count": 17,
+        "vessel_count": 15,
+        "mean_duration_hours": 86.52941176470588,
+        "total_stop_points": 1487
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.2086168784585,
+          58.18683659881423
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_064",
+        "event_count": 16,
+        "vessel_count": 16,
+        "mean_duration_hours": 30.625,
+        "total_stop_points": 506
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.555635993166286,
+          55.70535032517084
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_024",
+        "event_count": 15,
+        "vessel_count": 15,
+        "mean_duration_hours": 116.13333333333334,
+        "total_stop_points": 1756
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.654597762338426,
+          57.67849197649824
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_157",
+        "event_count": 15,
+        "vessel_count": 13,
+        "mean_duration_hours": 112.66666666666669,
+        "total_stop_points": 1702
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.384440261006292,
+          54.63180824371069
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_038",
+        "event_count": 15,
+        "vessel_count": 6,
+        "mean_duration_hours": 41.66666666666666,
+        "total_stop_points": 636
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.053102402284264,
+          55.82214056345178
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_090",
+        "event_count": 15,
+        "vessel_count": 5,
+        "mean_duration_hours": 51.53333333333333,
+        "total_stop_points": 788
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.85429123132184,
+          56.65748575718392
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_067",
+        "event_count": 14,
+        "vessel_count": 13,
+        "mean_duration_hours": 48.85714285714285,
+        "total_stop_points": 696
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.015411577294689,
+          54.81954385507247
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_078",
+        "event_count": 14,
+        "vessel_count": 5,
+        "mean_duration_hours": 45.57142857142857,
+        "total_stop_points": 621
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.712253233499377,
+          55.26200238854297
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_082",
+        "event_count": 14,
+        "vessel_count": 4,
+        "mean_duration_hours": 57.642857142857146,
+        "total_stop_points": 803
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.036187670437403,
+          54.47273854147813
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_035",
+        "event_count": 13,
+        "vessel_count": 13,
+        "mean_duration_hours": 50.0,
+        "total_stop_points": 663
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.99497898133484,
+          54.372770323529416
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_042",
+        "event_count": 13,
+        "vessel_count": 7,
+        "mean_duration_hours": 67.6923076923077,
+        "total_stop_points": 884
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.99211219570707,
+          54.68220288383838
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_046",
+        "event_count": 13,
+        "vessel_count": 5,
+        "mean_duration_hours": 29.46153846153846,
+        "total_stop_points": 396
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.523594295900178,
+          54.85205821568627
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_132",
+        "event_count": 13,
+        "vessel_count": 3,
+        "mean_duration_hours": 42.15384615384615,
+        "total_stop_points": 561
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.199067685185184,
+          55.21251742592593
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_131",
+        "event_count": 13,
+        "vessel_count": 2,
+        "mean_duration_hours": 7.615384615384615,
+        "total_stop_points": 108
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.922412896750526,
+          55.58707356656184
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_115",
+        "event_count": 12,
+        "vessel_count": 12,
+        "mean_duration_hours": 158.0,
+        "total_stop_points": 1908
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.569178693790146,
+          57.94302888650963
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_026",
+        "event_count": 12,
+        "vessel_count": 11,
+        "mean_duration_hours": 38.0,
+        "total_stop_points": 467
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.67122165042118,
+          54.75116529482551
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_104",
+        "event_count": 12,
+        "vessel_count": 7,
+        "mean_duration_hours": 69.5,
+        "total_stop_points": 831
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.18343792948718,
+          56.70567488461538
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_125",
+        "event_count": 12,
+        "vessel_count": 2,
+        "mean_duration_hours": 12.0,
+        "total_stop_points": 156
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.004432312206571,
+          55.96407984037558
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_133",
+        "event_count": 11,
+        "vessel_count": 11,
+        "mean_duration_hours": 57.27272727272727,
+        "total_stop_points": 639
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.243626466744455,
+          57.111540576429405
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_051",
+        "event_count": 11,
+        "vessel_count": 10,
+        "mean_duration_hours": 78.0909090909091,
+        "total_stop_points": 857
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.022153382352942,
+          56.803388137254906
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_095",
+        "event_count": 11,
+        "vessel_count": 1,
+        "mean_duration_hours": 4.0,
+        "total_stop_points": 51
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.671150019607843,
+          54.9992261372549
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_100",
+        "event_count": 11,
+        "vessel_count": 1,
+        "mean_duration_hours": 8.272727272727273,
+        "total_stop_points": 102
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.371989385714286,
+          54.9359571
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_105",
+        "event_count": 11,
+        "vessel_count": 1,
+        "mean_duration_hours": 5.363636363636363,
+        "total_stop_points": 70
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.028574175675674,
+          54.87601858108109
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_129",
+        "event_count": 11,
+        "vessel_count": 1,
+        "mean_duration_hours": 5.727272727272728,
+        "total_stop_points": 74
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.426511464010282,
+          55.03899901285348
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_031",
+        "event_count": 10,
+        "vessel_count": 9,
+        "mean_duration_hours": 77.4,
+        "total_stop_points": 778
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.135911152666669,
+          55.059128416
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_106",
+        "event_count": 10,
+        "vessel_count": 8,
+        "mean_duration_hours": 74.2,
+        "total_stop_points": 750
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.921995976562501,
+          56.97554124999999
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_134",
+        "event_count": 10,
+        "vessel_count": 1,
+        "mean_duration_hours": 11.8,
+        "total_stop_points": 128
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.998307101489758,
+          54.22358138547486
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_000",
+        "event_count": 9,
+        "vessel_count": 9,
+        "mean_duration_hours": 58.77777777777778,
+        "total_stop_points": 537
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.40003154032258,
+          55.4277004032258
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_022",
+        "event_count": 9,
+        "vessel_count": 8,
+        "mean_duration_hours": 41.22222222222222,
+        "total_stop_points": 372
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.618138206951024,
+          57.77233126382307
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_127",
+        "event_count": 9,
+        "vessel_count": 7,
+        "mean_duration_hours": 69.88888888888889,
+        "total_stop_points": 633
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.272497261979169,
+          57.05887553750001
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_156",
+        "event_count": 9,
+        "vessel_count": 6,
+        "mean_duration_hours": 105.66666666666669,
+        "total_stop_points": 960
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.46731723828125,
+          54.9531645390625
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_063",
+        "event_count": 9,
+        "vessel_count": 5,
+        "mean_duration_hours": 112.88888888888889,
+        "total_stop_points": 1024
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.112255535156253,
+          57.24408154101562
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_150",
+        "event_count": 9,
+        "vessel_count": 5,
+        "mean_duration_hours": 59.11111111111112,
+        "total_stop_points": 512
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.680392908163267,
+          54.72742234693878
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_037",
+        "event_count": 9,
+        "vessel_count": 3,
+        "mean_duration_hours": 4.888888888888889,
+        "total_stop_points": 49
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.514762391975308,
+          55.110101179012354
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_107",
+        "event_count": 9,
+        "vessel_count": 1,
+        "mean_duration_hours": 20.22222222222222,
+        "total_stop_points": 162
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.569977148717951,
+          55.516182917948726
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_138",
+        "event_count": 9,
+        "vessel_count": 1,
+        "mean_duration_hours": 22.77777777777778,
+        "total_stop_points": 195
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.664096235438883,
+          55.44836060131256
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_112",
+        "event_count": 8,
+        "vessel_count": 8,
+        "mean_duration_hours": 151.875,
+        "total_stop_points": 1219
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.359066684729063,
+          55.55545537602628
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_159",
+        "event_count": 8,
+        "vessel_count": 8,
+        "mean_duration_hours": 75.125,
+        "total_stop_points": 609
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.45790180952381,
+          56.09452271428572
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_123",
+        "event_count": 8,
+        "vessel_count": 4,
+        "mean_duration_hours": 22.625,
+        "total_stop_points": 147
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.985521842465753,
+          54.994627082191776
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_081",
+        "event_count": 8,
+        "vessel_count": 1,
+        "mean_duration_hours": 8.125,
+        "total_stop_points": 73
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.437188921686747,
+          54.96585320481928
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_085",
+        "event_count": 8,
+        "vessel_count": 1,
+        "mean_duration_hours": 9.375,
+        "total_stop_points": 83
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.50755490151515,
+          54.969378818181816
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_093",
+        "event_count": 8,
+        "vessel_count": 1,
+        "mean_duration_hours": 7.625,
+        "total_stop_points": 66
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.731679219298243,
+          55.9003687368421
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_160",
+        "event_count": 8,
+        "vessel_count": 1,
+        "mean_duration_hours": 7.375,
+        "total_stop_points": 57
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.82272510955056,
+          55.42421111235956
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_017",
+        "event_count": 7,
+        "vessel_count": 7,
+        "mean_duration_hours": 24.428571428571427,
+        "total_stop_points": 178
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.805268727272727,
+          58.08231781818183
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_151",
+        "event_count": 7,
+        "vessel_count": 7,
+        "mean_duration_hours": 2.142857142857143,
+        "total_stop_points": 22
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.602545840820312,
+          55.76050402734375
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_074",
+        "event_count": 7,
+        "vessel_count": 6,
+        "mean_duration_hours": 146.14285714285714,
+        "total_stop_points": 1024
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.712827823033708,
+          56.533929895131095
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_122",
+        "event_count": 7,
+        "vessel_count": 5,
+        "mean_duration_hours": 76.57142857142857,
+        "total_stop_points": 534
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.753778410526317,
+          54.68194482105264
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_049",
+        "event_count": 7,
+        "vessel_count": 3,
+        "mean_duration_hours": 40.285714285714285,
+        "total_stop_points": 285
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.511463188188978,
+          56.71587586929134
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_109",
+        "event_count": 7,
+        "vessel_count": 3,
+        "mean_duration_hours": 89.71428571428571,
+        "total_stop_points": 635
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.53225598076923,
+          57.332799975961535
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_117",
+        "event_count": 7,
+        "vessel_count": 3,
+        "mean_duration_hours": 99.85714285714286,
+        "total_stop_points": 624
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.842199590909088,
+          56.55103054545455
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_147",
+        "event_count": 7,
+        "vessel_count": 1,
+        "mean_duration_hours": 3.0,
+        "total_stop_points": 22
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.933025044155844,
+          54.6295136103896
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_044",
+        "event_count": 6,
+        "vessel_count": 6,
+        "mean_duration_hours": 63.5,
+        "total_stop_points": 385
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.451122652542374,
+          54.8059069039548
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_050",
+        "event_count": 6,
+        "vessel_count": 6,
+        "mean_duration_hours": 58.333333333333336,
+        "total_stop_points": 354
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.056491084269664,
+          56.45995810674157
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_058",
+        "event_count": 6,
+        "vessel_count": 6,
+        "mean_duration_hours": 28.83333333333333,
+        "total_stop_points": 178
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.48484836307054,
+          56.890981937759335
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_068",
+        "event_count": 6,
+        "vessel_count": 6,
+        "mean_duration_hours": 40.16666666666666,
+        "total_stop_points": 241
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.741863079861112,
+          55.21880261284722
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_101",
+        "event_count": 6,
+        "vessel_count": 4,
+        "mean_duration_hours": 100.83333333333331,
+        "total_stop_points": 576
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.417597451219512,
+          54.57782548780488
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_036",
+        "event_count": 6,
+        "vessel_count": 2,
+        "mean_duration_hours": 27.5,
+        "total_stop_points": 164
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.344050975,
+          55.1883308
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_103",
+        "event_count": 6,
+        "vessel_count": 1,
+        "mean_duration_hours": 2.333333333333333,
+        "total_stop_points": 20
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.505454389610389,
+          55.57911176948052
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_021",
+        "event_count": 5,
+        "vessel_count": 5,
+        "mean_duration_hours": 61.4,
+        "total_stop_points": 308
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.939325764610388,
+          54.66908243831168
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_034",
+        "event_count": 5,
+        "vessel_count": 5,
+        "mean_duration_hours": 60.6,
+        "total_stop_points": 308
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.388164039021852,
+          55.60954033298647
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_102",
+        "event_count": 5,
+        "vessel_count": 5,
+        "mean_duration_hours": 191.2,
+        "total_stop_points": 961
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.300974831129809,
+          56.560058171874985
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_116",
+        "event_count": 5,
+        "vessel_count": 5,
+        "mean_duration_hours": 165.4,
+        "total_stop_points": 832
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.355886436186188,
+          55.59431645045045
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_124",
+        "event_count": 5,
+        "vessel_count": 5,
+        "mean_duration_hours": 132.8,
+        "total_stop_points": 666
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.932884934752748,
+          55.41093182280219
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_155",
+        "event_count": 5,
+        "vessel_count": 5,
+        "mean_duration_hours": 144.6,
+        "total_stop_points": 728
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.256612773195874,
+          55.19914702061856
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_161",
+        "event_count": 5,
+        "vessel_count": 5,
+        "mean_duration_hours": 18.4,
+        "total_stop_points": 97
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.577412141304348,
+          57.56893317391304
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_152",
+        "event_count": 5,
+        "vessel_count": 4,
+        "mean_duration_hours": 17.4,
+        "total_stop_points": 92
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.352264845609064,
+          56.92926529461755
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_158",
+        "event_count": 5,
+        "vessel_count": 4,
+        "mean_duration_hours": 69.6,
+        "total_stop_points": 353
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.966806625,
+          54.854697125
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_079",
+        "event_count": 5,
+        "vessel_count": 3,
+        "mean_duration_hours": 0.6,
+        "total_stop_points": 8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.571816804347826,
+          54.20692482608696
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_041",
+        "event_count": 5,
+        "vessel_count": 2,
+        "mean_duration_hours": 4.2,
+        "total_stop_points": 23
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.959401456521745,
+          54.897830695652175
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_136",
+        "event_count": 5,
+        "vessel_count": 2,
+        "mean_duration_hours": 8.6,
+        "total_stop_points": 46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.640537590909091,
+          56.31643754545455
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_154",
+        "event_count": 5,
+        "vessel_count": 2,
+        "mean_duration_hours": 5.4,
+        "total_stop_points": 22
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.071417183333333,
+          54.22384523333334
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_059",
+        "event_count": 5,
+        "vessel_count": 1,
+        "mean_duration_hours": 7.0,
+        "total_stop_points": 30
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.801060082524272,
+          55.279060922330096
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_140",
+        "event_count": 5,
+        "vessel_count": 1,
+        "mean_duration_hours": 23.6,
+        "total_stop_points": 103
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.2874955,
+          55.205532567567566
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_146",
+        "event_count": 5,
+        "vessel_count": 1,
+        "mean_duration_hours": 8.2,
+        "total_stop_points": 37
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.773068811881188,
+          54.15272352475248
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_033",
+        "event_count": 4,
+        "vessel_count": 4,
+        "mean_duration_hours": 24.25,
+        "total_stop_points": 101
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.191589014981272,
+          54.41996357303371
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_040",
+        "event_count": 4,
+        "vessel_count": 4,
+        "mean_duration_hours": 132.5,
+        "total_stop_points": 534
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.598775091489362,
+          54.913039257446805
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_056",
+        "event_count": 4,
+        "vessel_count": 4,
+        "mean_duration_hours": 117.25,
+        "total_stop_points": 470
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.371304,
+          54.15196263636363
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_057",
+        "event_count": 4,
+        "vessel_count": 4,
+        "mean_duration_hours": 1.75,
+        "total_stop_points": 11
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.047553219557196,
+          54.89212950369004
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_062",
+        "event_count": 4,
+        "vessel_count": 4,
+        "mean_duration_hours": 135.5,
+        "total_stop_points": 542
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.835631431906618,
+          55.24845081322957
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_086",
+        "event_count": 4,
+        "vessel_count": 4,
+        "mean_duration_hours": 63.25,
+        "total_stop_points": 257
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.867548891439204,
+          56.79272428039702
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_108",
+        "event_count": 4,
+        "vessel_count": 4,
+        "mean_duration_hours": 201.25,
+        "total_stop_points": 806
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.726813330434782,
+          55.50449074782608
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_111",
+        "event_count": 4,
+        "vessel_count": 4,
+        "mean_duration_hours": 28.5,
+        "total_stop_points": 115
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.782076127232145,
+          54.90954423660714
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_114",
+        "event_count": 4,
+        "vessel_count": 4,
+        "mean_duration_hours": 55.0,
+        "total_stop_points": 224
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.863745574950691,
+          56.76426291124259
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_120",
+        "event_count": 4,
+        "vessel_count": 4,
+        "mean_duration_hours": 125.75,
+        "total_stop_points": 507
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.04549506802721,
+          56.68779365986396
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_139",
+        "event_count": 4,
+        "vessel_count": 4,
+        "mean_duration_hours": 36.0,
+        "total_stop_points": 147
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.345889230414745,
+          56.11011794930876
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_153",
+        "event_count": 4,
+        "vessel_count": 4,
+        "mean_duration_hours": 53.25,
+        "total_stop_points": 217
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.125453294655417,
+          56.716581347398034
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_118",
+        "event_count": 4,
+        "vessel_count": 3,
+        "mean_duration_hours": 178.0,
+        "total_stop_points": 711
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.668495194117646,
+          56.19444287899161
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_126",
+        "event_count": 4,
+        "vessel_count": 3,
+        "mean_duration_hours": 148.25,
+        "total_stop_points": 595
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.427505088235293,
+          54.61795170588236
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_032",
+        "event_count": 4,
+        "vessel_count": 2,
+        "mean_duration_hours": 3.75,
+        "total_stop_points": 17
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.230834889361702,
+          54.50359192340426
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_039",
+        "event_count": 4,
+        "vessel_count": 2,
+        "mean_duration_hours": 58.25,
+        "total_stop_points": 235
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.807574648760331,
+          54.4974722892562
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_048",
+        "event_count": 4,
+        "vessel_count": 2,
+        "mean_duration_hours": 29.25,
+        "total_stop_points": 121
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.761725040366973,
+          55.57914886238532
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_149",
+        "event_count": 4,
+        "vessel_count": 2,
+        "mean_duration_hours": 28.25,
+        "total_stop_points": 109
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.491681583333332,
+          54.83947571666667
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_094",
+        "event_count": 4,
+        "vessel_count": 1,
+        "mean_duration_hours": 14.25,
+        "total_stop_points": 60
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.882431272959185,
+          55.52276180612244
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_130",
+        "event_count": 4,
+        "vessel_count": 1,
+        "mean_duration_hours": 53.75,
+        "total_stop_points": 196
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.062197154189944,
+          55.50846652513967
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_143",
+        "event_count": 4,
+        "vessel_count": 1,
+        "mean_duration_hours": 47.75,
+        "total_stop_points": 179
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.909765636363636,
+          54.660900727272725
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_145",
+        "event_count": 4,
+        "vessel_count": 1,
+        "mean_duration_hours": 2.5,
+        "total_stop_points": 11
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.67763675,
+          57.593671125
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_148",
+        "event_count": 4,
+        "vessel_count": 1,
+        "mean_duration_hours": 1.25,
+        "total_stop_points": 8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.03385991469194,
+          54.19815338625593
+        ]
+      },
+      "properties": {
+        "anchorage_id": "anchorage_162",
+        "event_count": 3,
+        "vessel_count": 3,
+        "mean_duration_hours": 142.33333333333334,
+        "total_stop_points": 422
+      }
+    }
+  ]
+}

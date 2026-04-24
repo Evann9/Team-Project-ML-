@@ -1,0 +1,132 @@
+{
+  "train_data": "C:\\work\\teampro\\shipml\\route_anal\\ais_data_10day.csv",
+  "predict_data": "C:\\work\\teampro\\shipml\\route_anal\\ais_data_10day.csv",
+  "model_path": "C:\\work\\teampro\\shipml\\route_anal\\ship_anal_model.joblib",
+  "clean_train_points": 343714,
+  "train_vessels": 3414,
+  "predicted_vessels": 3414,
+  "route_classes": 12,
+  "label_source": "kmeans_signature",
+  "metrics": {
+    "train_vessels": 3414,
+    "route_classes": 12,
+    "holdout_accuracy": 0.9546120058565154,
+    "holdout_f1_macro": 0.9595117202790967,
+    "classification_report": {
+      "route_00": {
+        "precision": 1.0,
+        "recall": 0.9354838709677419,
+        "f1-score": 0.9666666666666667,
+        "support": 31.0
+      },
+      "route_01": {
+        "precision": 0.9444444444444444,
+        "recall": 0.9596774193548387,
+        "f1-score": 0.952,
+        "support": 124.0
+      },
+      "route_02": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 28.0
+      },
+      "route_03": {
+        "precision": 0.975609756097561,
+        "recall": 0.975609756097561,
+        "f1-score": 0.975609756097561,
+        "support": 41.0
+      },
+      "route_04": {
+        "precision": 0.9594594594594594,
+        "recall": 1.0,
+        "f1-score": 0.9793103448275862,
+        "support": 71.0
+      },
+      "route_05": {
+        "precision": 0.9615384615384616,
+        "recall": 0.9803921568627451,
+        "f1-score": 0.970873786407767,
+        "support": 51.0
+      },
+      "route_06": {
+        "precision": 0.9811320754716981,
+        "recall": 0.9629629629629629,
+        "f1-score": 0.9719626168224299,
+        "support": 54.0
+      },
+      "route_07": {
+        "precision": 0.9523809523809523,
+        "recall": 0.8823529411764706,
+        "f1-score": 0.916030534351145,
+        "support": 68.0
+      },
+      "route_08": {
+        "precision": 1.0,
+        "recall": 0.9772727272727273,
+        "f1-score": 0.9885057471264368,
+        "support": 44.0
+      },
+      "route_09": {
+        "precision": 1.0,
+        "recall": 0.8857142857142857,
+        "f1-score": 0.9393939393939394,
+        "support": 35.0
+      },
+      "route_10": {
+        "precision": 0.953125,
+        "recall": 0.953125,
+        "f1-score": 0.953125,
+        "support": 64.0
+      },
+      "route_11": {
+        "precision": 0.8607594936708861,
+        "recall": 0.9444444444444444,
+        "f1-score": 0.9006622516556292,
+        "support": 72.0
+      },
+      "accuracy": 0.9546120058565154,
+      "macro avg": {
+        "precision": 0.9657041369219552,
+        "recall": 0.9547529637378148,
+        "f1-score": 0.9595117202790967,
+        "support": 683.0
+      },
+      "weighted avg": {
+        "precision": 0.9560599043233888,
+        "recall": 0.9546120058565154,
+        "f1-score": 0.9546955267526601,
+        "support": 683.0
+      }
+    }
+  },
+  "anomaly_thresholds": {
+    "global_threshold": 4.471102518876474,
+    "per_route_threshold": {
+      "route_00": 3.663217785296076,
+      "route_01": 4.454993695235818,
+      "route_02": 3.1266177215723197,
+      "route_03": 3.8159107527646667,
+      "route_04": 3.9988863107056822,
+      "route_05": 4.7727135229159625,
+      "route_06": 4.795039096516717,
+      "route_07": 5.100996907258432,
+      "route_08": 3.907456090320062,
+      "route_09": 3.740023557864132,
+      "route_10": 4.83570377166518,
+      "route_11": 4.7435108245362505
+    },
+    "train_distance_mean": 2.3492020596787953,
+    "train_distance_std": 1.134031808172742
+  },
+  "anomaly_count": 174,
+  "anchorage_cluster_count": 163,
+  "outputs": {
+    "route_predictions": "C:\\work\\teampro\\shipml\\route_anal\\outputs\\route_predictions.csv",
+    "anomaly_ships": "C:\\work\\teampro\\shipml\\route_anal\\outputs\\anomaly_ships.csv",
+    "anchorage_predictions": "C:\\work\\teampro\\shipml\\route_anal\\outputs\\anchorage_predictions.csv",
+    "anchorage_clusters": "C:\\work\\teampro\\shipml\\route_anal\\outputs\\anchorage_clusters.csv",
+    "route_catalog": "C:\\work\\teampro\\shipml\\route_anal\\outputs\\route_catalog.csv",
+    "route_centers_long": "C:\\work\\teampro\\shipml\\route_anal\\outputs\\route_centers_long.csv"
+  }
+}
