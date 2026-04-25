@@ -1,0 +1,73 @@
+{
+  "model_name": "xgboost",
+  "display_name": "XGBoost",
+  "trained_at": "2026-04-25T02:57:06.331257+00:00",
+  "train_rows": 293758,
+  "target_classes": [
+    "Cargo",
+    "Dredging",
+    "Fishing",
+    "HSC",
+    "Law enforcement",
+    "Military",
+    "Passenger",
+    "Pilot",
+    "Pleasure",
+    "SAR",
+    "Sailing",
+    "Tanker",
+    "Towing",
+    "Tug"
+  ],
+  "feature_columns": [
+    "navigationalstatus",
+    "sog",
+    "cog",
+    "heading",
+    "width",
+    "length",
+    "draught",
+    "cog_sin",
+    "cog_cos",
+    "heading_sin",
+    "heading_cos"
+  ],
+  "best_metrics": {
+    "model_name": "xgboost",
+    "display_name": "XGBoost",
+    "test_accuracy": 0.9887493191721133,
+    "macro_f1": 0.9786884431248682,
+    "weighted_f1": 0.9887297402580077
+  },
+  "all_metrics": [
+    {
+      "model_name": "xgboost",
+      "display_name": "XGBoost",
+      "test_accuracy": 0.9887493191721133,
+      "macro_f1": 0.9786884431248682,
+      "weighted_f1": 0.9887297402580077
+    },
+    {
+      "model_name": "random_forest",
+      "display_name": "RandomForest",
+      "test_accuracy": 0.9719498910675382,
+      "macro_f1": 0.9635392701841452,
+      "weighted_f1": 0.9716898615785149
+    },
+    {
+      "model_name": "voting",
+      "display_name": "VotingClassifier",
+      "test_accuracy": 0.9642054738562091,
+      "macro_f1": 0.9500145865941001,
+      "weighted_f1": 0.9637584806871544
+    },
+    {
+      "model_name": "logistic_regression",
+      "display_name": "LogisticRegression",
+      "test_accuracy": 0.5990944989106753,
+      "macro_f1": 0.5478783294550608,
+      "weighted_f1": 0.6255518593116217
+    }
+  ],
+  "skipped_models": {}
+}

@@ -1,0 +1,736 @@
+{
+  "rows": 3414,
+  "model": {
+    "model_name": "xgboost",
+    "display_name": "XGBoost",
+    "trained_at": "2026-04-25T02:57:06.331257+00:00",
+    "train_rows": 293758,
+    "target_classes": [
+      "Cargo",
+      "Dredging",
+      "Fishing",
+      "HSC",
+      "Law enforcement",
+      "Military",
+      "Passenger",
+      "Pilot",
+      "Pleasure",
+      "SAR",
+      "Sailing",
+      "Tanker",
+      "Towing",
+      "Tug"
+    ],
+    "feature_columns": [
+      "navigationalstatus",
+      "sog",
+      "cog",
+      "heading",
+      "width",
+      "length",
+      "draught",
+      "cog_sin",
+      "cog_cos",
+      "heading_sin",
+      "heading_cos"
+    ],
+    "best_metrics": {
+      "model_name": "xgboost",
+      "display_name": "XGBoost",
+      "test_accuracy": 0.9887493191721133,
+      "macro_f1": 0.9786884431248682,
+      "weighted_f1": 0.9887297402580077
+    },
+    "all_metrics": [
+      {
+        "model_name": "xgboost",
+        "display_name": "XGBoost",
+        "test_accuracy": 0.9887493191721133,
+        "macro_f1": 0.9786884431248682,
+        "weighted_f1": 0.9887297402580077
+      },
+      {
+        "model_name": "random_forest",
+        "display_name": "RandomForest",
+        "test_accuracy": 0.9719498910675382,
+        "macro_f1": 0.9635392701841452,
+        "weighted_f1": 0.9716898615785149
+      },
+      {
+        "model_name": "voting",
+        "display_name": "VotingClassifier",
+        "test_accuracy": 0.9642054738562091,
+        "macro_f1": 0.9500145865941001,
+        "weighted_f1": 0.9637584806871544
+      },
+      {
+        "model_name": "logistic_regression",
+        "display_name": "LogisticRegression",
+        "test_accuracy": 0.5990944989106753,
+        "macro_f1": 0.5478783294550608,
+        "weighted_f1": 0.6255518593116217
+      }
+    ],
+    "skipped_models": {}
+  },
+  "shiptype_counts": [
+    {
+      "shiptype": "Cargo",
+      "vessel_count": 1651
+    },
+    {
+      "shiptype": "Fishing",
+      "vessel_count": 774
+    },
+    {
+      "shiptype": "Tanker",
+      "vessel_count": 368
+    },
+    {
+      "shiptype": "Tug",
+      "vessel_count": 186
+    },
+    {
+      "shiptype": "Dredging",
+      "vessel_count": 88
+    },
+    {
+      "shiptype": "HSC",
+      "vessel_count": 71
+    },
+    {
+      "shiptype": "Towing",
+      "vessel_count": 60
+    },
+    {
+      "shiptype": "SAR",
+      "vessel_count": 59
+    },
+    {
+      "shiptype": "Law enforcement",
+      "vessel_count": 58
+    },
+    {
+      "shiptype": "Military",
+      "vessel_count": 52
+    },
+    {
+      "shiptype": "Pilot",
+      "vessel_count": 16
+    },
+    {
+      "shiptype": "Pleasure",
+      "vessel_count": 12
+    },
+    {
+      "shiptype": "Passenger",
+      "vessel_count": 11
+    },
+    {
+      "shiptype": "Sailing",
+      "vessel_count": 8
+    }
+  ],
+  "route_type_counts": [
+    {
+      "predicted_shiptype": "Cargo",
+      "predicted_route": "route_01",
+      "vessel_count": 226
+    },
+    {
+      "predicted_shiptype": "Cargo",
+      "predicted_route": "route_04",
+      "vessel_count": 185
+    },
+    {
+      "predicted_shiptype": "Cargo",
+      "predicted_route": "route_06",
+      "vessel_count": 166
+    },
+    {
+      "predicted_shiptype": "Cargo",
+      "predicted_route": "route_05",
+      "vessel_count": 165
+    },
+    {
+      "predicted_shiptype": "Cargo",
+      "predicted_route": "route_07",
+      "vessel_count": 147
+    },
+    {
+      "predicted_shiptype": "Cargo",
+      "predicted_route": "route_11",
+      "vessel_count": 134
+    },
+    {
+      "predicted_shiptype": "Cargo",
+      "predicted_route": "route_00",
+      "vessel_count": 129
+    },
+    {
+      "predicted_shiptype": "Cargo",
+      "predicted_route": "route_08",
+      "vessel_count": 117
+    },
+    {
+      "predicted_shiptype": "Cargo",
+      "predicted_route": "route_10",
+      "vessel_count": 115
+    },
+    {
+      "predicted_shiptype": "Cargo",
+      "predicted_route": "route_02",
+      "vessel_count": 94
+    },
+    {
+      "predicted_shiptype": "Cargo",
+      "predicted_route": "route_09",
+      "vessel_count": 89
+    },
+    {
+      "predicted_shiptype": "Cargo",
+      "predicted_route": "route_03",
+      "vessel_count": 84
+    },
+    {
+      "predicted_shiptype": "Dredging",
+      "predicted_route": "route_04",
+      "vessel_count": 16
+    },
+    {
+      "predicted_shiptype": "Dredging",
+      "predicted_route": "route_01",
+      "vessel_count": 12
+    },
+    {
+      "predicted_shiptype": "Dredging",
+      "predicted_route": "route_03",
+      "vessel_count": 12
+    },
+    {
+      "predicted_shiptype": "Dredging",
+      "predicted_route": "route_07",
+      "vessel_count": 12
+    },
+    {
+      "predicted_shiptype": "Dredging",
+      "predicted_route": "route_08",
+      "vessel_count": 12
+    },
+    {
+      "predicted_shiptype": "Dredging",
+      "predicted_route": "route_11",
+      "vessel_count": 11
+    },
+    {
+      "predicted_shiptype": "Dredging",
+      "predicted_route": "route_09",
+      "vessel_count": 7
+    },
+    {
+      "predicted_shiptype": "Dredging",
+      "predicted_route": "route_10",
+      "vessel_count": 4
+    },
+    {
+      "predicted_shiptype": "Dredging",
+      "predicted_route": "route_00",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "Dredging",
+      "predicted_route": "route_02",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "Fishing",
+      "predicted_route": "route_01",
+      "vessel_count": 236
+    },
+    {
+      "predicted_shiptype": "Fishing",
+      "predicted_route": "route_11",
+      "vessel_count": 163
+    },
+    {
+      "predicted_shiptype": "Fishing",
+      "predicted_route": "route_10",
+      "vessel_count": 118
+    },
+    {
+      "predicted_shiptype": "Fishing",
+      "predicted_route": "route_07",
+      "vessel_count": 97
+    },
+    {
+      "predicted_shiptype": "Fishing",
+      "predicted_route": "route_03",
+      "vessel_count": 51
+    },
+    {
+      "predicted_shiptype": "Fishing",
+      "predicted_route": "route_04",
+      "vessel_count": 49
+    },
+    {
+      "predicted_shiptype": "Fishing",
+      "predicted_route": "route_09",
+      "vessel_count": 29
+    },
+    {
+      "predicted_shiptype": "Fishing",
+      "predicted_route": "route_08",
+      "vessel_count": 24
+    },
+    {
+      "predicted_shiptype": "Fishing",
+      "predicted_route": "route_05",
+      "vessel_count": 4
+    },
+    {
+      "predicted_shiptype": "Fishing",
+      "predicted_route": "route_06",
+      "vessel_count": 3
+    },
+    {
+      "predicted_shiptype": "HSC",
+      "predicted_route": "route_08",
+      "vessel_count": 15
+    },
+    {
+      "predicted_shiptype": "HSC",
+      "predicted_route": "route_04",
+      "vessel_count": 14
+    },
+    {
+      "predicted_shiptype": "HSC",
+      "predicted_route": "route_03",
+      "vessel_count": 13
+    },
+    {
+      "predicted_shiptype": "HSC",
+      "predicted_route": "route_07",
+      "vessel_count": 9
+    },
+    {
+      "predicted_shiptype": "HSC",
+      "predicted_route": "route_01",
+      "vessel_count": 7
+    },
+    {
+      "predicted_shiptype": "HSC",
+      "predicted_route": "route_09",
+      "vessel_count": 7
+    },
+    {
+      "predicted_shiptype": "HSC",
+      "predicted_route": "route_10",
+      "vessel_count": 3
+    },
+    {
+      "predicted_shiptype": "HSC",
+      "predicted_route": "route_11",
+      "vessel_count": 3
+    },
+    {
+      "predicted_shiptype": "Law enforcement",
+      "predicted_route": "route_04",
+      "vessel_count": 13
+    },
+    {
+      "predicted_shiptype": "Law enforcement",
+      "predicted_route": "route_01",
+      "vessel_count": 11
+    },
+    {
+      "predicted_shiptype": "Law enforcement",
+      "predicted_route": "route_08",
+      "vessel_count": 11
+    },
+    {
+      "predicted_shiptype": "Law enforcement",
+      "predicted_route": "route_03",
+      "vessel_count": 7
+    },
+    {
+      "predicted_shiptype": "Law enforcement",
+      "predicted_route": "route_07",
+      "vessel_count": 7
+    },
+    {
+      "predicted_shiptype": "Law enforcement",
+      "predicted_route": "route_10",
+      "vessel_count": 4
+    },
+    {
+      "predicted_shiptype": "Law enforcement",
+      "predicted_route": "route_09",
+      "vessel_count": 3
+    },
+    {
+      "predicted_shiptype": "Law enforcement",
+      "predicted_route": "route_11",
+      "vessel_count": 2
+    },
+    {
+      "predicted_shiptype": "Military",
+      "predicted_route": "route_07",
+      "vessel_count": 14
+    },
+    {
+      "predicted_shiptype": "Military",
+      "predicted_route": "route_01",
+      "vessel_count": 9
+    },
+    {
+      "predicted_shiptype": "Military",
+      "predicted_route": "route_04",
+      "vessel_count": 6
+    },
+    {
+      "predicted_shiptype": "Military",
+      "predicted_route": "route_08",
+      "vessel_count": 6
+    },
+    {
+      "predicted_shiptype": "Military",
+      "predicted_route": "route_11",
+      "vessel_count": 6
+    },
+    {
+      "predicted_shiptype": "Military",
+      "predicted_route": "route_03",
+      "vessel_count": 5
+    },
+    {
+      "predicted_shiptype": "Military",
+      "predicted_route": "route_10",
+      "vessel_count": 4
+    },
+    {
+      "predicted_shiptype": "Military",
+      "predicted_route": "route_09",
+      "vessel_count": 2
+    },
+    {
+      "predicted_shiptype": "Passenger",
+      "predicted_route": "route_07",
+      "vessel_count": 4
+    },
+    {
+      "predicted_shiptype": "Passenger",
+      "predicted_route": "route_01",
+      "vessel_count": 2
+    },
+    {
+      "predicted_shiptype": "Passenger",
+      "predicted_route": "route_04",
+      "vessel_count": 2
+    },
+    {
+      "predicted_shiptype": "Passenger",
+      "predicted_route": "route_05",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "Passenger",
+      "predicted_route": "route_09",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "Passenger",
+      "predicted_route": "route_11",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "Pilot",
+      "predicted_route": "route_07",
+      "vessel_count": 6
+    },
+    {
+      "predicted_shiptype": "Pilot",
+      "predicted_route": "route_11",
+      "vessel_count": 5
+    },
+    {
+      "predicted_shiptype": "Pilot",
+      "predicted_route": "route_04",
+      "vessel_count": 2
+    },
+    {
+      "predicted_shiptype": "Pilot",
+      "predicted_route": "route_01",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "Pilot",
+      "predicted_route": "route_09",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "Pilot",
+      "predicted_route": "route_10",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "Pleasure",
+      "predicted_route": "route_01",
+      "vessel_count": 2
+    },
+    {
+      "predicted_shiptype": "Pleasure",
+      "predicted_route": "route_03",
+      "vessel_count": 2
+    },
+    {
+      "predicted_shiptype": "Pleasure",
+      "predicted_route": "route_08",
+      "vessel_count": 2
+    },
+    {
+      "predicted_shiptype": "Pleasure",
+      "predicted_route": "route_11",
+      "vessel_count": 2
+    },
+    {
+      "predicted_shiptype": "Pleasure",
+      "predicted_route": "route_04",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "Pleasure",
+      "predicted_route": "route_07",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "Pleasure",
+      "predicted_route": "route_09",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "Pleasure",
+      "predicted_route": "route_10",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "SAR",
+      "predicted_route": "route_01",
+      "vessel_count": 20
+    },
+    {
+      "predicted_shiptype": "SAR",
+      "predicted_route": "route_11",
+      "vessel_count": 8
+    },
+    {
+      "predicted_shiptype": "SAR",
+      "predicted_route": "route_04",
+      "vessel_count": 7
+    },
+    {
+      "predicted_shiptype": "SAR",
+      "predicted_route": "route_08",
+      "vessel_count": 6
+    },
+    {
+      "predicted_shiptype": "SAR",
+      "predicted_route": "route_09",
+      "vessel_count": 6
+    },
+    {
+      "predicted_shiptype": "SAR",
+      "predicted_route": "route_03",
+      "vessel_count": 5
+    },
+    {
+      "predicted_shiptype": "SAR",
+      "predicted_route": "route_07",
+      "vessel_count": 4
+    },
+    {
+      "predicted_shiptype": "SAR",
+      "predicted_route": "route_10",
+      "vessel_count": 2
+    },
+    {
+      "predicted_shiptype": "SAR",
+      "predicted_route": "route_02",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "Sailing",
+      "predicted_route": "route_04",
+      "vessel_count": 2
+    },
+    {
+      "predicted_shiptype": "Sailing",
+      "predicted_route": "route_10",
+      "vessel_count": 2
+    },
+    {
+      "predicted_shiptype": "Sailing",
+      "predicted_route": "route_01",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "Sailing",
+      "predicted_route": "route_03",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "Sailing",
+      "predicted_route": "route_08",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "Sailing",
+      "predicted_route": "route_11",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "Tanker",
+      "predicted_route": "route_06",
+      "vessel_count": 98
+    },
+    {
+      "predicted_shiptype": "Tanker",
+      "predicted_route": "route_05",
+      "vessel_count": 84
+    },
+    {
+      "predicted_shiptype": "Tanker",
+      "predicted_route": "route_02",
+      "vessel_count": 47
+    },
+    {
+      "predicted_shiptype": "Tanker",
+      "predicted_route": "route_01",
+      "vessel_count": 28
+    },
+    {
+      "predicted_shiptype": "Tanker",
+      "predicted_route": "route_10",
+      "vessel_count": 26
+    },
+    {
+      "predicted_shiptype": "Tanker",
+      "predicted_route": "route_04",
+      "vessel_count": 24
+    },
+    {
+      "predicted_shiptype": "Tanker",
+      "predicted_route": "route_00",
+      "vessel_count": 23
+    },
+    {
+      "predicted_shiptype": "Tanker",
+      "predicted_route": "route_09",
+      "vessel_count": 15
+    },
+    {
+      "predicted_shiptype": "Tanker",
+      "predicted_route": "route_03",
+      "vessel_count": 8
+    },
+    {
+      "predicted_shiptype": "Tanker",
+      "predicted_route": "route_11",
+      "vessel_count": 8
+    },
+    {
+      "predicted_shiptype": "Tanker",
+      "predicted_route": "route_08",
+      "vessel_count": 4
+    },
+    {
+      "predicted_shiptype": "Tanker",
+      "predicted_route": "route_07",
+      "vessel_count": 3
+    },
+    {
+      "predicted_shiptype": "Towing",
+      "predicted_route": "route_01",
+      "vessel_count": 11
+    },
+    {
+      "predicted_shiptype": "Towing",
+      "predicted_route": "route_07",
+      "vessel_count": 11
+    },
+    {
+      "predicted_shiptype": "Towing",
+      "predicted_route": "route_04",
+      "vessel_count": 9
+    },
+    {
+      "predicted_shiptype": "Towing",
+      "predicted_route": "route_10",
+      "vessel_count": 9
+    },
+    {
+      "predicted_shiptype": "Towing",
+      "predicted_route": "route_03",
+      "vessel_count": 6
+    },
+    {
+      "predicted_shiptype": "Towing",
+      "predicted_route": "route_08",
+      "vessel_count": 6
+    },
+    {
+      "predicted_shiptype": "Towing",
+      "predicted_route": "route_09",
+      "vessel_count": 4
+    },
+    {
+      "predicted_shiptype": "Towing",
+      "predicted_route": "route_11",
+      "vessel_count": 3
+    },
+    {
+      "predicted_shiptype": "Towing",
+      "predicted_route": "route_06",
+      "vessel_count": 1
+    },
+    {
+      "predicted_shiptype": "Tug",
+      "predicted_route": "route_01",
+      "vessel_count": 50
+    },
+    {
+      "predicted_shiptype": "Tug",
+      "predicted_route": "route_10",
+      "vessel_count": 35
+    },
+    {
+      "predicted_shiptype": "Tug",
+      "predicted_route": "route_04",
+      "vessel_count": 26
+    },
+    {
+      "predicted_shiptype": "Tug",
+      "predicted_route": "route_07",
+      "vessel_count": 25
+    },
+    {
+      "predicted_shiptype": "Tug",
+      "predicted_route": "route_08",
+      "vessel_count": 17
+    },
+    {
+      "predicted_shiptype": "Tug",
+      "predicted_route": "route_09",
+      "vessel_count": 12
+    },
+    {
+      "predicted_shiptype": "Tug",
+      "predicted_route": "route_03",
+      "vessel_count": 11
+    },
+    {
+      "predicted_shiptype": "Tug",
+      "predicted_route": "route_11",
+      "vessel_count": 10
+    }
+  ]
+}

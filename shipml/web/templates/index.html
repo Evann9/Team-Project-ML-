@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>선종별 예측 항로 지도</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet/leaflet.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="map-stage">
+        <div id="map"></div>
+        <div class="toolbar" aria-label="지도 필터">
+          <label>
+            <span>선종</span>
+            <select id="shipTypeSelect"></select>
+          </label>
+          <label>
+            <span>항로</span>
+            <select id="routeSelect"></select>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="anomalyOnly" />
+            <span>이상 항로</span>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="trackToggle" />
+            <span>AIS 항적</span>
+          </label>
+        </div>
+        <aside class="panel" aria-label="요약">
+          <div class="metric-grid">
+            <div>
+              <span class="metric-label">선박</span>
+              <strong id="shipCount">0</strong>
+            </div>
+            <div>
+              <span class="metric-label">표시</span>
+              <strong id="shownShipCount">0</strong>
+            </div>
+            <div>
+              <span class="metric-label">모델</span>
+              <strong id="modelName">-</strong>
+            </div>
+            <div>
+              <span class="metric-label">정확도</span>
+              <strong id="modelAccuracy">-</strong>
+            </div>
+          </div>
+          <div class="route-list" id="routeList"></div>
+        </aside>
+      </section>
+    </main>
+    <script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js') }}"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>

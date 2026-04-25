@@ -1,0 +1,552 @@
+{
+  "created_at": "2026-04-25T03:43:11.932753+00:00",
+  "data_path": "C:\\work\\teampro\\shipml\\type_anal\\ais_mmsi_incl.csv",
+  "target": "shiptype",
+  "group_col": "mmsi",
+  "group_col_used_as_feature": false,
+  "feature_columns": [
+    "navigationalstatus",
+    "sog",
+    "cog",
+    "heading",
+    "width",
+    "length",
+    "draught",
+    "cog_sin",
+    "cog_cos",
+    "heading_sin",
+    "heading_cos"
+  ],
+  "split": {
+    "method": "StratifiedGroupKFold(n_splits=5)",
+    "requested_test_size": 0.2,
+    "train_rows": 249627,
+    "test_rows": 67168,
+    "train_class_counts": {
+      "Cargo": 146593,
+      "Dredging": 4336,
+      "Fishing": 9447,
+      "HSC": 14,
+      "Law enforcement": 1034,
+      "Military": 3377,
+      "Passenger": 12370,
+      "Pilot": 2426,
+      "Pleasure": 46,
+      "SAR": 315,
+      "Sailing": 115,
+      "Tanker": 61977,
+      "Towing": 608,
+      "Tug": 6969
+    },
+    "test_class_counts": {
+      "Cargo": 39683,
+      "Dredging": 471,
+      "Fishing": 2846,
+      "HSC": 1993,
+      "Law enforcement": 74,
+      "Military": 1605,
+      "Passenger": 3428,
+      "Pilot": 583,
+      "SAR": 58,
+      "Tanker": 15085,
+      "Towing": 160,
+      "Tug": 1182
+    },
+    "leakage_check": {
+      "train_groups": 2190,
+      "test_groups": 544,
+      "overlap_groups": 0,
+      "overlap_ratio_of_test_groups": 0.0
+    }
+  },
+  "group_split_metrics": [
+    {
+      "model_name": "random_forest",
+      "display_name": "RandomForest",
+      "test_accuracy": 0.8453281324440209,
+      "macro_f1": 0.7377958881982408,
+      "weighted_f1": 0.8403436631819403,
+      "classification_report": {
+        "Cargo": {
+          "precision": 0.8467498628634119,
+          "recall": 0.9335735705465816,
+          "f1-score": 0.8880445856055612,
+          "support": 39683.0
+        },
+        "Dredging": {
+          "precision": 0.4392935982339956,
+          "recall": 0.42250530785562634,
+          "f1-score": 0.43073593073593075,
+          "support": 471.0
+        },
+        "Fishing": {
+          "precision": 0.9621818181818181,
+          "recall": 0.9297259311314126,
+          "f1-score": 0.9456754824874911,
+          "support": 2846.0
+        },
+        "HSC": {
+          "precision": 1.0,
+          "recall": 0.9879578524836929,
+          "f1-score": 0.993942453306411,
+          "support": 1993.0
+        },
+        "Law enforcement": {
+          "precision": 0.859375,
+          "recall": 0.7432432432432432,
+          "f1-score": 0.7971014492753623,
+          "support": 74.0
+        },
+        "Military": {
+          "precision": 0.9853658536585366,
+          "recall": 0.7551401869158878,
+          "f1-score": 0.855026455026455,
+          "support": 1605.0
+        },
+        "Passenger": {
+          "precision": 0.9278510473235065,
+          "recall": 0.6977829638273045,
+          "f1-score": 0.7965367965367965,
+          "support": 3428.0
+        },
+        "Pilot": {
+          "precision": 0.8215297450424929,
+          "recall": 0.9948542024013722,
+          "f1-score": 0.899922420480993,
+          "support": 583.0
+        },
+        "SAR": {
+          "precision": 1.0,
+          "recall": 0.5172413793103449,
+          "f1-score": 0.6818181818181818,
+          "support": 58.0
+        },
+        "Tanker": {
+          "precision": 0.7880816596412926,
+          "recall": 0.6320848525024859,
+          "f1-score": 0.7015155974102413,
+          "support": 15085.0
+        },
+        "Towing": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 160.0
+        },
+        "Tug": {
+          "precision": 0.7962830593280915,
+          "recall": 0.9424703891708968,
+          "f1-score": 0.8632313056954669,
+          "support": 1182.0
+        },
+        "accuracy": 0.8453281324440209,
+        "macro avg": {
+          "precision": 0.7855593036894288,
+          "recall": 0.7130483232824041,
+          "f1-score": 0.7377958881982408,
+          "support": 67168.0
+        },
+        "weighted avg": {
+          "precision": 0.8446284113840496,
+          "recall": 0.8453281324440209,
+          "f1-score": 0.8403436631819403,
+          "support": 67168.0
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "Cargo",
+          "Dredging",
+          "Fishing",
+          "HSC",
+          "Law enforcement",
+          "Military",
+          "Passenger",
+          "Pilot",
+          "SAR",
+          "Tanker",
+          "Towing",
+          "Tug"
+        ],
+        "note": "See classification_report for per-class metrics."
+      }
+    },
+    {
+      "model_name": "xgboost",
+      "display_name": "XGBoost",
+      "test_accuracy": 0.8022123630300143,
+      "macro_f1": 0.53034593354418,
+      "weighted_f1": 0.7824588240902521,
+      "classification_report": {
+        "Cargo": {
+          "precision": 0.8051717637666053,
+          "recall": 0.914900587153189,
+          "f1-score": 0.8565362021374479,
+          "support": 39683.0
+        },
+        "Dredging": {
+          "precision": 0.23712948517940718,
+          "recall": 0.3227176220806794,
+          "f1-score": 0.2733812949640288,
+          "support": 471.0
+        },
+        "Fishing": {
+          "precision": 0.958904109589041,
+          "recall": 0.9592410400562192,
+          "f1-score": 0.9590725452309854,
+          "support": 2846.0
+        },
+        "HSC": {
+          "precision": 1.0,
+          "recall": 0.023582538886101356,
+          "f1-score": 0.04607843137254902,
+          "support": 1993.0
+        },
+        "Law enforcement": {
+          "precision": 0.8955223880597015,
+          "recall": 0.8108108108108109,
+          "f1-score": 0.851063829787234,
+          "support": 74.0
+        },
+        "Military": {
+          "precision": 0.9844903988183161,
+          "recall": 0.8305295950155763,
+          "f1-score": 0.900980060831362,
+          "support": 1605.0
+        },
+        "Passenger": {
+          "precision": 0.6885119506553585,
+          "recall": 0.2605017502917153,
+          "f1-score": 0.377989417989418,
+          "support": 3428.0
+        },
+        "Pilot": {
+          "precision": 0.8781725888324873,
+          "recall": 0.8902229845626072,
+          "f1-score": 0.8841567291311755,
+          "support": 583.0
+        },
+        "Pleasure": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 0.0
+        },
+        "SAR": {
+          "precision": 1.0,
+          "recall": 0.4827586206896552,
+          "f1-score": 0.6511627906976745,
+          "support": 58.0
+        },
+        "Sailing": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 0.0
+        },
+        "Tanker": {
+          "precision": 0.7796523889171697,
+          "recall": 0.7107059993370898,
+          "f1-score": 0.7435844083784159,
+          "support": 15085.0
+        },
+        "Towing": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 160.0
+        },
+        "Tug": {
+          "precision": 0.8402457757296466,
+          "recall": 0.9255499153976311,
+          "f1-score": 0.8808373590982287,
+          "support": 1182.0
+        },
+        "accuracy": 0.8022123630300143,
+        "macro avg": {
+          "precision": 0.6477000606819809,
+          "recall": 0.5093943903058052,
+          "f1-score": 0.53034593354418,
+          "support": 67168.0
+        },
+        "weighted avg": {
+          "precision": 0.8056836039727814,
+          "recall": 0.8022123630300143,
+          "f1-score": 0.7824588240902521,
+          "support": 67168.0
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "Cargo",
+          "Dredging",
+          "Fishing",
+          "HSC",
+          "Law enforcement",
+          "Military",
+          "Passenger",
+          "Pilot",
+          "SAR",
+          "Tanker",
+          "Towing",
+          "Tug"
+        ],
+        "note": "See classification_report for per-class metrics."
+      }
+    }
+  ],
+  "skipped_models": {},
+  "row_level_random_split_metrics": [
+    {
+      "model_name": "xgboost",
+      "display_name": "XGBoost",
+      "test_accuracy": 0.9882731735033697,
+      "macro_f1": 0.985570945152567,
+      "weighted_f1": 0.9882442521780945,
+      "classification_report": {
+        "Cargo": {
+          "precision": 0.9872509535113221,
+          "recall": 0.9935579116897061,
+          "f1-score": 0.9903943918231926,
+          "support": 37255.0
+        },
+        "Dredging": {
+          "precision": 0.9948078920041536,
+          "recall": 0.9968782518210197,
+          "f1-score": 0.9958419958419958,
+          "support": 961.0
+        },
+        "Fishing": {
+          "precision": 0.9995933306222041,
+          "recall": 0.9995933306222041,
+          "f1-score": 0.9995933306222041,
+          "support": 2459.0
+        },
+        "HSC": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 401.0
+        },
+        "Law enforcement": {
+          "precision": 0.9954954954954955,
+          "recall": 0.9954954954954955,
+          "f1-score": 0.9954954954954955,
+          "support": 222.0
+        },
+        "Military": {
+          "precision": 0.996,
+          "recall": 1.0,
+          "f1-score": 0.9979959919839679,
+          "support": 996.0
+        },
+        "Passenger": {
+          "precision": 1.0,
+          "recall": 0.9971518987341772,
+          "f1-score": 0.9985739185549042,
+          "support": 3160.0
+        },
+        "Pilot": {
+          "precision": 0.9884678747940692,
+          "recall": 0.9966777408637874,
+          "f1-score": 0.9925558312655087,
+          "support": 602.0
+        },
+        "Pleasure": {
+          "precision": 0.9,
+          "recall": 1.0,
+          "f1-score": 0.9473684210526315,
+          "support": 9.0
+        },
+        "SAR": {
+          "precision": 0.9848484848484849,
+          "recall": 0.8666666666666667,
+          "f1-score": 0.9219858156028369,
+          "support": 75.0
+        },
+        "Sailing": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 23.0
+        },
+        "Tanker": {
+          "precision": 0.9842566365852052,
+          "recall": 0.9695042823773683,
+          "f1-score": 0.9768247638348642,
+          "support": 15412.0
+        },
+        "Towing": {
+          "precision": 0.9806451612903225,
+          "recall": 0.987012987012987,
+          "f1-score": 0.9838187702265372,
+          "support": 154.0
+        },
+        "Tug": {
+          "precision": 0.9981572481572482,
+          "recall": 0.9969325153374233,
+          "f1-score": 0.9975445058317987,
+          "support": 1630.0
+        },
+        "accuracy": 0.9882731735033697,
+        "macro avg": {
+          "precision": 0.9863945055220361,
+          "recall": 0.9856765057586311,
+          "f1-score": 0.985570945152567,
+          "support": 63359.0
+        },
+        "weighted avg": {
+          "precision": 0.9882646649514066,
+          "recall": 0.9882731735033697,
+          "f1-score": 0.9882442521780945,
+          "support": 63359.0
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "Cargo",
+          "Dredging",
+          "Fishing",
+          "HSC",
+          "Law enforcement",
+          "Military",
+          "Passenger",
+          "Pilot",
+          "Pleasure",
+          "SAR",
+          "Sailing",
+          "Tanker",
+          "Towing",
+          "Tug"
+        ],
+        "note": "See classification_report for per-class metrics."
+      }
+    },
+    {
+      "model_name": "random_forest",
+      "display_name": "RandomForest",
+      "test_accuracy": 0.9708802222257296,
+      "macro_f1": 0.9665078977490724,
+      "weighted_f1": 0.9706322233984328,
+      "classification_report": {
+        "Cargo": {
+          "precision": 0.9622341534612177,
+          "recall": 0.9909810763655885,
+          "f1-score": 0.9763960699787102,
+          "support": 37255.0
+        },
+        "Dredging": {
+          "precision": 0.9909808342728298,
+          "recall": 0.9146722164412071,
+          "f1-score": 0.9512987012987013,
+          "support": 961.0
+        },
+        "Fishing": {
+          "precision": 0.9991866612444082,
+          "recall": 0.9991866612444082,
+          "f1-score": 0.9991866612444082,
+          "support": 2459.0
+        },
+        "HSC": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 401.0
+        },
+        "Law enforcement": {
+          "precision": 0.9908256880733946,
+          "recall": 0.972972972972973,
+          "f1-score": 0.9818181818181818,
+          "support": 222.0
+        },
+        "Military": {
+          "precision": 0.9809236947791165,
+          "recall": 0.9809236947791165,
+          "f1-score": 0.9809236947791165,
+          "support": 996.0
+        },
+        "Passenger": {
+          "precision": 0.9951393389500972,
+          "recall": 0.9718354430379746,
+          "f1-score": 0.9833493435798911,
+          "support": 3160.0
+        },
+        "Pilot": {
+          "precision": 0.9819376026272578,
+          "recall": 0.9933554817275747,
+          "f1-score": 0.9876135425268373,
+          "support": 602.0
+        },
+        "Pleasure": {
+          "precision": 1.0,
+          "recall": 0.8888888888888888,
+          "f1-score": 0.9411764705882353,
+          "support": 9.0
+        },
+        "SAR": {
+          "precision": 0.96875,
+          "recall": 0.8266666666666667,
+          "f1-score": 0.8920863309352518,
+          "support": 75.0
+        },
+        "Sailing": {
+          "precision": 1.0,
+          "recall": 0.8695652173913043,
+          "f1-score": 0.9302325581395349,
+          "support": 23.0
+        },
+        "Tanker": {
+          "precision": 0.9779961251037919,
+          "recall": 0.9170776018686737,
+          "f1-score": 0.9465577283686043,
+          "support": 15412.0
+        },
+        "Towing": {
+          "precision": 0.9864864864864865,
+          "recall": 0.948051948051948,
+          "f1-score": 0.9668874172185431,
+          "support": 154.0
+        },
+        "Tug": {
+          "precision": 0.9896530736457699,
+          "recall": 0.9975460122699387,
+          "f1-score": 0.9935838680109991,
+          "support": 1630.0
+        },
+        "accuracy": 0.9708802222257296,
+        "macro avg": {
+          "precision": 0.9874366899031691,
+          "recall": 0.947980277264733,
+          "f1-score": 0.9665078977490724,
+          "support": 63359.0
+        },
+        "weighted avg": {
+          "precision": 0.9711908644172293,
+          "recall": 0.9708802222257296,
+          "f1-score": 0.9706322233984328,
+          "support": 63359.0
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "Cargo",
+          "Dredging",
+          "Fishing",
+          "HSC",
+          "Law enforcement",
+          "Military",
+          "Passenger",
+          "Pilot",
+          "Pleasure",
+          "SAR",
+          "Sailing",
+          "Tanker",
+          "Towing",
+          "Tug"
+        ],
+        "note": "See classification_report for per-class metrics."
+      }
+    }
+  ],
+  "row_level_random_split_note": "This is the old row-level split. It may be optimistic because points from the same MMSI can appear in both train and test."
+}
