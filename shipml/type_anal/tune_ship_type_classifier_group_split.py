@@ -1,3 +1,13 @@
+"""MMSI 그룹 분할 선박 종류 분류기의 하이퍼파라미터 튜닝.
+
+이 스크립트는 같은 선박 그룹이 검증 fold와 외부 홀드아웃에 동시에 나타나지
+않도록 하면서 RandomForest 후보를 튜닝한다. 흐름은 의도적으로 nested
+구조다. 먼저 외부 MMSI 그룹 홀드아웃을 만들고, 학습 쪽 데이터에서만
+StratifiedGroupKFold로 하이퍼파라미터를 찾는다. 그 다음 튜닝된 모델을
+건드리지 않은 홀드아웃에서 평가하고, 마지막으로 선택 설정을 전체 행에
+다시 학습시켜 배포한다.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -70,6 +80,14 @@ DEFAULT_MODEL_METRICS_PATH = (
 
 
 def parse_args() -> argparse.Namespace:
+    """RandomForest 그룹 인식 튜닝을 위한 CLI 옵션을 파싱한다.
+
+    표준 입출력 경로 외에도, 외부 홀드아웃 크기, 내부 교차검증 fold 수,
+    랜덤 탐색 예산, 더 빠른 탐색을 위한 선택적 그룹 보존 다운샘플링, 그리고
+    탐색 wrapper와 RandomForest estimator 자체의 병렬 처리 설정을 각각
+    제어한다.
+    """
+
     parser = argparse.ArgumentParser(
         description=(
             "Tune the MMSI group-split ship-type RandomForest model without "
@@ -156,6 +174,15 @@ def parse_args() -> argparse.Namespace:
 
 
 def parameter_space() -> dict[str, list[Any]]:
+    """RandomForest 파이프라인의 하이퍼파라미터 탐색 공간을 반환한다.
+
+    튜닝 대상 estimator가 sklearn Pipeline이므로 파라미터 이름에는
+    ``classifier__`` 접두사가 붙는다. 값 목록은 트리 개수, 깊이,
+    leaf/split 정규화, 특징 서브샘플링, 클래스 가중치, bootstrap 동작을
+    포함한다. 이들은 표 형태 AIS 분류 문제에서 성능과 과적합에 영향을 줄
+    가능성이 큰 조정값들이다.
+    """
+
     return {
         "classifier__n_estimators": [200, 300, 500, 700],
         "classifier__max_depth": [None, 12, 20, 32, 48],
@@ -168,6 +195,8 @@ def parameter_space() -> dict[str, list[Any]]:
 
 
 def scoring_map() -> dict[str, Any]:
+    """사용자 친화적 점수 이름을 sklearn scoring 식별자로 매핑한다."""
+
     return {
         "macro_f1": "f1_macro",
         "weighted_f1": "f1_weighted",
@@ -179,6 +208,13 @@ def prepare_data(
     data_path: Path,
     group_col_name: str,
 ) -> tuple[pd.DataFrame, pd.Series, pd.Series, str]:
+    """특징을 읽고 각도 인코딩을 추가한 뒤 타깃/그룹 컬럼을 분리한다.
+
+    숫자 MMSI 포맷 차이로 우연한 불일치가 생기지 않도록 그룹 컬럼은
+    문자열로 변환한다. 분류기에 직접 누수되는 것을 막기 위해 그룹 컬럼과
+    타깃은 특징 행렬에서 제거한다.
+    """
+
     df = add_trig_features(load_type_data(data_path))
     group_col = resolve_column(df, group_col_name)
     df[group_col] = df[group_col].astype(str)
@@ -195,6 +231,14 @@ def sample_search_groups(
     train_groups: pd.Series,
     max_groups: int,
 ) -> tuple[pd.DataFrame, pd.Series, pd.Series]:
+    """선박 그룹을 쪼개지 않고 내부 탐색 데이터만 선택적으로 줄인다.
+
+    전체 AIS 테이블에서 하이퍼파라미터 탐색을 하면 비용이 클 수 있다. 그룹
+    상한이 주어지면 이 함수는 개별 행이 아니라 MMSI 그룹 전체를 샘플링하므로
+    탐색 부분집합에서도 누수 방지 가정이 유지된다. 각 그룹의 최빈 클래스를
+    기준으로, 예시 수가 충분할 때는 선택 그룹을 stratify하려고 시도한다.
+    """
+
     if max_groups <= 0 or train_groups.nunique() <= max_groups:
         return x_train, y_train, train_groups
 
@@ -219,6 +263,14 @@ def make_random_forest_pipeline(
     x_train: pd.DataFrame,
     estimator_n_jobs: int,
 ) -> Any:
+    """공유 RandomForest Pipeline을 만들고 estimator 병렬성을 설정한다.
+
+    파이프라인은 ``model_specs``에서 가져오므로 튜닝은 그룹 분할 학습기와
+    정확히 같은 전처리 및 기준 estimator 정의를 사용한다. 큰 실행에서 CPU
+    코어를 과도하게 잡아먹지 않도록 탐색 수준 병렬성과 트리 생성 병렬성을
+    따로 설정하기 위해 여기서 ``estimator_n_jobs``를 주입한다.
+    """
+
     categorical_cols, numeric_cols = split_columns(x_train)
     specs, skipped = model_specs(categorical_cols, numeric_cols, {"random_forest"})
     if skipped:
@@ -235,6 +287,8 @@ def top_confusion_pairs(
     y_pred: np.ndarray,
     top_n: int = 12,
 ) -> list[dict[str, Any]]:
+    """가장 자주 발생한 실제값-예측값 오분류 쌍을 추출한다."""
+
     labels = sorted(set(y_true.astype(str)).union(set(map(str, y_pred))))
     cm = confusion_matrix(y_true, y_pred, labels=labels)
     pairs: list[dict[str, Any]] = []
@@ -255,6 +309,13 @@ def evaluate_holdout(
     y_train: pd.Series,
     y_test: pd.Series,
 ) -> tuple[Any, dict[str, Any]]:
+    """튜닝된 파라미터를 외부 train 행에 학습하고 외부 홀드아웃을 평가한다.
+
+    탐색에 사용한 estimator를 건드리지 않은 템플릿으로 남기기 위해 학습 전에
+    clone한다. 지표는 MMSI가 겹치지 않는 홀드아웃에서 계산하며, 전체
+    classification report와 빠른 오류 확인을 위한 주요 혼동 쌍을 포함한다.
+    """
+
     model = clone(estimator)
     model.fit(x_train, y_train)
     pred = model.predict(x_test)
@@ -278,6 +339,14 @@ def evaluate_holdout(
 
 
 def compact_cv_results(search: RandomizedSearchCV, top_n: int = 10) -> list[dict[str, Any]]:
+    """긴 RandomizedSearchCV 결과를 작은 순위표로 변환한다.
+
+    전체 ``cv_results_`` 객체에는 시간 정보와 split별 컬럼이 많이 들어 있다.
+    이 헬퍼는 상위 설정의 순위, 평균/표준편차 검증 점수, 파라미터만 남긴다.
+    덕분에 튜닝 JSON을 읽기 좋게 유지하면서도 선택 파라미터를 감사하는 데
+    필요한 정보는 보존할 수 있다.
+    """
+
     results = pd.DataFrame(search.cv_results_)
     score_col = f"mean_test_{search.refit}" if isinstance(search.refit, str) else "mean_test_score"
     if score_col not in results.columns:
@@ -302,6 +371,14 @@ def train_full_bundle(
     search: RandomizedSearchCV,
     split_info: dict[str, Any],
 ) -> dict[str, Any]:
+    """튜닝된 RandomForest를 전체 행에 다시 학습하고 모델 번들을 구성한다.
+
+    탐색과 홀드아웃 평가는 최종 하이퍼파라미터를 결정하지만, 저장 산출물은
+    모든 라벨 예시에서 학습해야 한다. 번들은 다른 선박 종류 학습기와 같은
+    구조를 따르며, 홀드아웃 지표와 교차검증 탐색 메타데이터를 모두 기록해
+    배포 estimator가 어떻게 선택되었는지 확인할 수 있게 한다.
+    """
+
     final_estimator = clone(best_estimator)
     final_estimator.fit(x, y)
     categorical_cols, numeric_cols = split_columns(x)
@@ -339,6 +416,8 @@ def train_full_bundle(
 
 
 def main() -> None:
+    """nested 그룹 인식 튜닝을 실행하고 지표와 모델을 저장한다."""
+
     args = parse_args()
     x, y, groups, group_col = prepare_data(args.data.resolve(), args.group_col)
 

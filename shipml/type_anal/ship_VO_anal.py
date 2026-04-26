@@ -1,4 +1,11 @@
 # Voting 모델
+"""단독 soft-voting 선박 종류 분류기 실험 스크립트.
+
+이 스크립트는 LogisticRegression, RandomForestClassifier, ExtraTreesClassifier를
+soft voting으로 섞은 앙상블을 비교한다. 파이프라인은 공유 전처리를 사용하고,
+AIS 종류 특징에 앙상블을 학습한 뒤, 홀드아웃 지표와 혼동 요약을 출력한다.
+후보를 배포용 학습기로 승격하기 전에 읽기 쉬운 실험으로 확인하는 데 유용하다.
+"""
 
 import pandas as pd
 from sklearn.compose import ColumnTransformer
@@ -16,6 +23,8 @@ TARGET = "shiptype"
 
 
 def print_top_confusion_pairs(cm_df, top_n=10):
+    """빠른 오류 검토를 위해 가장 큰 off-diagonal 혼동 쌍을 출력한다."""
+
     errors = []
     for actual in cm_df.index:
         for predicted in cm_df.columns:
@@ -32,7 +41,7 @@ def print_top_confusion_pairs(cm_df, top_n=10):
     for actual, predicted, count in errors[:top_n]:
         print(f"{actual} -> {predicted}: {count}")
 
-
+# 가공된 특징 테이블을 읽고 타깃 라벨을 분리한다.
 df = pd.read_csv(DATA_PATH)
 print("data shape:", df.shape)
 print(df.head())
@@ -43,11 +52,15 @@ y = df[TARGET]
 categorical_cols = X.select_dtypes(include=["object"]).columns.tolist()
 numeric_cols = X.select_dtypes(exclude=["object"]).columns.tolist()
 
+# 앙상블 성능은 희귀 클래스와 예상 밖의 범주형 특징 변화에 영향을 받을 수
+# 있으므로 스키마와 라벨 분포를 출력한다.
 print("categorical columns:", categorical_cols)
 print("numeric columns:", numeric_cols)
 print("target classes:", y.nunique())
 print(y.value_counts())
 
+# 충분히 표현된 각 선박 종류가 train/test 양쪽에 나타나도록 stratified
+# 홀드아웃을 사용한다.
 X_train, X_test, y_train, y_test = train_test_split(
     X,
     y,
@@ -59,6 +72,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 print("train shape:", X_train.shape, y_train.shape)
 print("test shape:", X_test.shape, y_test.shape)
 
+# 앙상블에 선형 learner가 포함되어 있으므로 숫자형 특징을 표준화한다.
+# 트리 learner는 스케일링에 강건하므로, 빠른 비교에서는 스케일된 표현을
+# 공유해도 괜찮다.
 preprocessor = ColumnTransformer(
     transformers=[
         (
@@ -87,6 +103,8 @@ preprocessor = ColumnTransformer(
     ]
 )
 
+# soft voting은 서로 보완적인 learner들의 클래스 확률을 평균낸다. 여기서는
+# 선형 모델, bagged forest, extremely randomized forest를 사용한다.
 model = Pipeline(
     steps=[
         ("preprocessor", preprocessor),
@@ -127,8 +145,10 @@ model = Pipeline(
     ]
 )
 
+# 전체 앙상블 파이프라인을 train 행에만 학습한다.
 model.fit(X_train, y_train)
 
+# train과 holdout 예측을 비교해 앙상블이 암기하는지 확인한다.
 train_pred = model.predict(X_train)
 test_pred = model.predict(X_test)
 
@@ -169,6 +189,8 @@ print(classification_report(y_test, test_pred))
 #       macro avg       0.96      0.95      0.95     58752
 #    weighted avg       0.96      0.96      0.96     58752
 
+# 홀드아웃 예측을 혼동 행렬로 변환하고, 상세 report 뒤에 가장 큰 오분류 쌍을
+# 나열한다.
 labels = sorted(y.unique())
 cm = confusion_matrix(y_test, test_pred, labels=labels)
 cm_df = pd.DataFrame(cm, index=labels, columns=labels)

@@ -1,3 +1,13 @@
+"""항로 분류, 이상 탐지, 정박지 분석을 학습하고 실행한다.
+
+이 스크립트는 원본 AIS 포인트 track을 선박 단위 특징으로 변환한다. 기존
+항로 컬럼이 있으면 그 라벨을 사용하고, 없으면 전체 궤적 signature에 대한
+KMeans cluster로 항로 라벨을 학습한다. 이후 초기 track 증거로 RandomForest
+분류기를 학습하고, 거리 기반 이상 임계값을 계산하며, 정박 stop event를
+탐지한다. 마지막으로 downstream 보고서와 지도 레이어에 쓸 모델 번들과 CSV
+출력을 내보낸다.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -35,6 +45,14 @@ ROUTE_LABEL_CANDIDATES = (
 
 @dataclass
 class FeatureBuildResult:
+    """AIS 포인트 데이터셋에서 만들어진 모든 특징 테이블을 담는 컨테이너.
+
+    ``vessels``는 MMSI당 하나의 집계 행을 담고, ``signature``는 전체 정규화
+    궤적을 설명한다. ``early_signature``는 예측에 쓰는 초기 구간만 설명하며,
+    ``clean_points``는 이후 정박지 분석과 내보내기에 사용할 정제된 포인트
+    단위 입력을 보관한다.
+    """
+
     vessels: pd.DataFrame
     signature: pd.DataFrame
     early_signature: pd.DataFrame
@@ -42,6 +60,8 @@ class FeatureBuildResult:
 
 
 def parse_args() -> argparse.Namespace:
+    """항로 모델 학습과 일괄 예측을 위한 CLI 옵션을 파싱한다."""
+
     parser = argparse.ArgumentParser(
         description=(
             "Train and run AIS route prediction, anomaly analysis, and "
@@ -133,6 +153,13 @@ def parse_args() -> argparse.Namespace:
 
 
 def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """흔한 AIS 컬럼명 변형을 스크립트 스키마로 정규화한다.
+
+    입력 파일은 같은 필드에 대해 대소문자나 약어가 다를 때가 많다. 이 함수는
+    헤더의 공백을 제거하고 알려진 변형을 표준 이름으로 바꿔, 이후 파이프라인이
+    안정적인 컬럼 식별자 집합에 의존할 수 있게 한다.
+    """
+
     df = df.copy()
     df.columns = df.columns.astype(str).str.strip()
 
@@ -167,6 +194,14 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def load_and_clean_ais(path: Path) -> pd.DataFrame:
+    """원본 AIS CSV 데이터를 읽고 모델링용 유효성 검사를 적용한다.
+
+    정제 단계는 필수 항해 컬럼, 선택적 선박 메타데이터, 가능한 항로 라벨
+    후보만 유지한다. 타입을 변환하고, 잘못된 MMSI와 좌표 값을 제거하며,
+    반복 포인트를 중복 제거한다. 또한 선박별 track을 timestamp 순으로 정렬하고,
+    누락된 정적 선박 속성은 MMSI별 중앙값과 전역 fallback으로 채운다.
+    """
+
     if not path.exists():
         raise FileNotFoundError(f"AIS CSV not found: {path}")
 
@@ -254,6 +289,8 @@ def haversine_km(
     lat2: np.ndarray | float,
     lon2: np.ndarray | float,
 ) -> np.ndarray | float:
+    """좌표쌍 사이의 대권거리를 킬로미터 단위로 계산한다."""
+
     lat1_rad = np.radians(lat1)
     lon1_rad = np.radians(lon1)
     lat2_rad = np.radians(lat2)
@@ -269,6 +306,8 @@ def haversine_km(
 
 
 def bearing_degrees(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """시작점에서 끝점으로 향하는 초기 방위각을 계산한다."""
+
     lat1_rad = math.radians(lat1)
     lat2_rad = math.radians(lat2)
     dlon = math.radians(lon2 - lon1)
@@ -280,6 +319,8 @@ def bearing_degrees(lat1: float, lon1: float, lat2: float, lon2: float) -> float
 
 
 def safe_median(values: pd.Series) -> float:
+    """숫자 중앙값을 반환하고, 모든 값이 비어 있으면 0.0으로 fallback한다."""
+
     numeric = pd.to_numeric(values, errors="coerce")
     if numeric.notna().any():
         return float(numeric.median())
@@ -287,6 +328,13 @@ def safe_median(values: pd.Series) -> float:
 
 
 def sample_track_signature(group: pd.DataFrame, points: int) -> np.ndarray:
+    """선박 track을 고정 길이 위도/경도 signature로 표현한다.
+
+    track마다 지속 시간과 포인트 개수가 다르므로, clustering과 거리 계산에는
+    정규화된 표현이 필요하다. 이 함수는 각 track을 ``points``개의 균등한
+    timestamp 위치로 보간하고, 샘플링된 위도/경도 쌍을 하나의 벡터로 펼친다.
+    """
+
     group = group.sort_values("Timestamp", kind="mergesort")
     lat = group["Latitude"].to_numpy(dtype=float)
     lon = group["Longitude"].to_numpy(dtype=float)
@@ -317,6 +365,13 @@ def sample_track_signature(group: pd.DataFrame, points: int) -> np.ndarray:
 
 
 def early_track(group: pd.DataFrame, early_fraction: float) -> pd.DataFrame:
+    """항로 예측에 사용할 track의 초기 구간을 반환한다.
+
+    분류기는 전체 궤적을 알기 전에 선박의 가능성 높은 항로를 예측할 수
+    있도록 초기 증거로 학습된다. 매우 짧거나 지속 시간이 0인 track은 가능한
+    한 최소 두 포인트를 보존하도록 처음 몇 행을 fallback으로 사용한다.
+    """
+
     if len(group) <= 2:
         return group
 
@@ -336,6 +391,8 @@ def early_track(group: pd.DataFrame, early_fraction: float) -> pd.DataFrame:
 
 
 def signature_columns(prefix: str, points: int) -> list[str]:
+    """펼쳐진 궤적 signature 벡터에 사용할 안정적인 컬럼명을 만든다."""
+
     cols: list[str] = []
     for idx in range(points):
         cols.append(f"{prefix}_lat_{idx:02d}")
@@ -348,6 +405,14 @@ def build_features(
     route_points: int,
     early_fraction: float,
 ) -> FeatureBuildResult:
+    """포인트 단위 AIS track을 선박 단위 모델 입력으로 집계한다.
+
+    각 MMSI에 대해 시간, 공간, 속도, 방향, 선박 크기, 항로 형태 요약을
+    계산한다. 또한 고정 길이 궤적 signature 두 개를 저장한다. 하나는
+    clustering 및 이상 거리 계산에 쓰는 전체 항로이고, 다른 하나는 예측 시
+    분류기 증거로 쓰는 초기 항로다.
+    """
+
     vessel_rows: list[dict[str, Any]] = []
     signatures: list[np.ndarray] = []
     early_signatures: list[np.ndarray] = []
@@ -432,6 +497,8 @@ def build_features(
 
 
 def choose_cluster_count(vessel_count: int, requested: int) -> int:
+    """보수적인 KMeans 항로 cluster 개수를 선택한다."""
+
     if requested and requested > 1:
         return min(requested, max(vessel_count, 1))
     if vessel_count < 3:
@@ -440,6 +507,8 @@ def choose_cluster_count(vessel_count: int, requested: int) -> int:
 
 
 def resolve_target_column(df: pd.DataFrame, requested: str | None) -> str | None:
+    """사용할 항로 라벨 컬럼을 찾는다. 요청값이 있거나 후보 컬럼이 있을 때 반환한다."""
+
     if requested:
         if requested not in df.columns:
             raise ValueError(f"Requested target column not found: {requested}")
@@ -455,6 +524,13 @@ def make_feature_matrix(
     vessels: pd.DataFrame,
     early_signature: pd.DataFrame,
 ) -> tuple[pd.DataFrame, list[str]]:
+    """집계 특징과 초기 형태 특징으로 분류기 특징 행렬을 조립한다.
+
+    정적 선박 요약과 항로 진행 특징을 초기 궤적 signature와 이어 붙인다.
+    DataFrame과 함께 컬럼 목록을 반환해, 저장 번들이 학습 때의 특징 순서를
+    보존할 수 있게 한다.
+    """
+
     base_cols = [
         "point_count",
         "duration_hours",
@@ -503,6 +579,15 @@ def train_route_labels(
     requested_clusters: int,
     random_state: int,
 ) -> tuple[pd.Series, dict[str, Any]]:
+    """기존 컬럼이나 궤적 clustering에서 항로 라벨을 만든다.
+
+    라벨이 있는 항로 데이터가 있으면 해당 라벨을 그대로 사용하고, 이상 점수
+    계산을 위해 scaled signature 공간에서 centroid를 계산한다. 라벨이 없으면
+    KMeans가 전체 궤적 signature를 cluster하고 cluster ID를 안정적인
+    ``route_XX`` 라벨로 바꾼다. 반환되는 ``route_info``에는 이후 필요한
+    scaler, 선택적 cluster 모델, 항로 centroid가 저장된다.
+    """
+
     route_info: dict[str, Any] = {
         "target_col": target_col,
         "label_source": "existing_column" if target_col else "kmeans_signature",
@@ -548,6 +633,14 @@ def train_classifier(
     y: pd.Series,
     random_state: int,
 ) -> tuple[Pipeline, dict[str, Any]]:
+    """초기 track 항로 분류기와 선택적 홀드아웃 지표를 학습한다.
+
+    분류기는 집계 특징과 초기 궤적 증거만 사용해 전체 항로 라벨을 예측한다.
+    데이터셋이 충분히 크고 균형 잡혀 있으면 stratified 홀드아웃으로
+    accuracy/F1 진단을 수행한다. 홀드아웃 가능 여부와 관계없이, 최종 반환
+    분류기는 배포를 위해 전체 행에 학습된다.
+    """
+
     classifier = Pipeline(
         steps=[
             ("imputer", SimpleImputer(strategy="median")),
@@ -601,6 +694,8 @@ def route_distances(
     signature_scaler: StandardScaler,
     route_centroids: dict[str, np.ndarray],
 ) -> np.ndarray:
+    """각 전체 궤적이 배정된 항로 centroid에서 얼마나 떨어져 있는지 측정한다."""
+
     scaled = signature_scaler.transform(signature)
     distances: list[float] = []
     for idx, label in enumerate(route_labels):
@@ -615,6 +710,13 @@ def train_anomaly_thresholds(
     route_info: dict[str, Any],
     anomaly_quantile: float,
 ) -> dict[str, Any]:
+    """비정상 궤적을 표시하는 데 쓸 항로 거리 임계값을 학습한다.
+
+    거리는 항로 라벨에 사용한 것과 같은 scaled signature 공간에서 계산한다.
+    이 함수는 전역 임계값과 항로별 임계값을 모두 기록하여, 흔한 항로와
+    드물거나 변동성이 큰 항로가 더 적절한 이상 cutoff를 갖도록 한다.
+    """
+
     distances = route_distances(
         signature,
         route_labels,
@@ -641,6 +743,8 @@ def train_anomaly_thresholds(
 
 
 def detect_stop_events(df: pd.DataFrame, slow_sog: float) -> pd.DataFrame:
+    """선박 track에서 연속된 저속 stop event를 추출한다."""
+
     rows: list[dict[str, Any]] = []
 
     for mmsi, group in df.groupby("MMSI", sort=False, observed=True):
@@ -679,6 +783,8 @@ def cluster_anchorages(
     eps_km: float,
     min_samples: int,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """DBSCAN으로 stop-event 중심을 가능한 정박지 영역으로 cluster한다."""
+
     if stop_events.empty:
         return stop_events.assign(anchorage_id=pd.Series(dtype="object")), pd.DataFrame()
 
@@ -725,6 +831,8 @@ def assign_nearest_anchorage(
     anchorage_clusters: pd.DataFrame,
     eps_km: float,
 ) -> pd.DataFrame:
+    """각 선박의 끝점을 가장 가까운 학습된 정박지 cluster에 배정한다."""
+
     base_cols = ["MMSI", "end_lat", "end_lon"]
     result = vessels[base_cols].copy()
 
@@ -769,6 +877,13 @@ def predict_routes(
     anchorage_clusters: pd.DataFrame,
     eps_km: float,
 ) -> pd.DataFrame:
+    """선박별 항로, 이상 점수, 정박 목적지를 예측한다.
+
+    항로 확률은 분류기에서 나오며, 이상 점수는 예측 항로 centroid와의 거리와
+    분류기 불확실성을 결합한다. 정박지 예측은 이후 병합되어 최종 CSV가 선박당
+    한 행으로 항로, 이상 여부, 목적지 맥락을 모두 담게 한다.
+    """
+
     x, _ = make_feature_matrix(built.vessels, built.early_signature)
     classifier: Pipeline = bundle["classifier"]
     predicted = pd.Series(classifier.predict(x), name="predicted_route").astype(str)
@@ -849,6 +964,8 @@ def build_route_catalog(
     labels: pd.Series,
     route_info: dict[str, Any],
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """학습된 모든 항로 라벨에 대한 요약표와 중심선 테이블을 만든다."""
+
     route_rows: list[dict[str, Any]] = []
     center_rows: list[dict[str, Any]] = []
 
@@ -889,6 +1006,8 @@ def build_route_catalog(
 
 
 def save_json(path: Path, data: dict[str, Any]) -> None:
+    """numpy/pandas 값을 JSON으로 변환 가능한 형태로 바꿔 실행 요약을 저장한다."""
+
     def default(value: Any) -> Any:
         if isinstance(value, (np.integer, np.floating)):
             return value.item()
@@ -905,6 +1024,14 @@ def save_json(path: Path, data: dict[str, Any]) -> None:
 
 
 def train_and_run(args: argparse.Namespace) -> None:
+    """항로 모델 번들을 학습하고 예측을 실행한 뒤 모든 출력을 저장한다.
+
+    이 함수는 스크립트의 orchestration 계층이다. 데이터를 읽고 정제하고,
+    특징을 만들고, 항로 라벨을 생성하거나 읽으며, 분류기와 이상/정박지
+    헬퍼를 학습한다. 이후 joblib 번들을 저장하고 요청 데이터셋을 예측한 뒤,
+    프로젝트의 다른 부분에서 사용할 CSV/JSON 산출물을 내보낸다.
+    """
+
     output_dir = args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -1054,6 +1181,8 @@ def train_and_run(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
+    """항로 분석 모델 생성을 위한 CLI 진입점."""
+
     args = parse_args()
     train_and_run(args)
 

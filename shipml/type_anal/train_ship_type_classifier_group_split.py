@@ -1,3 +1,12 @@
+"""MMSI 기준 그룹 홀드아웃 평가로 선박 종류 분류기를 학습한다.
+
+이 스크립트는 기존 행 단위 분할 학습기의 누수 방지 버전이다. 평가 시
+선박 식별자를 그룹 컬럼으로 사용하여 같은 MMSI가 train과 test 양쪽에
+동시에 나타나지 않게 한다. 요청된 분류기 계열을 그룹 분할에서 비교한 뒤,
+선택된 모델을 전체 행에 다시 학습시키고 배포 가능한 joblib 번들, 간결한
+지표, CSV 진단 파일을 저장한다.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -58,6 +67,14 @@ DEFAULT_CONFUSION_PAIRS_PATH = (
 
 
 def parse_args() -> argparse.Namespace:
+    """그룹 분할 모델 평가와 내보내기를 위한 CLI 옵션을 파싱한다.
+
+    인자는 입출력 위치, 누수 방지 그룹으로 쓸 컬럼, 비교할 모델 계열,
+    그리고 기존 행 단위 랜덤 분할을 기준선으로 함께 실행할지 여부를
+    제어한다. 기준선 옵션은 선박 누수 때문에 성능이 얼마나 낙관적으로
+    보였는지 정량화할 때 유용하다.
+    """
+
     parser = argparse.ArgumentParser(
         description=(
             "Evaluate ship-type classifiers with a leakage-resistant group split. "
@@ -131,6 +148,13 @@ def parse_args() -> argparse.Namespace:
 
 
 def resolve_column(df: pd.DataFrame, requested: str) -> str:
+    """사용자가 입력한 컬럼명을 대소문자 구분 없이 찾는다.
+
+    CSV 파일은 ``mmsi``, ``MMSI``처럼 대소문자가 다를 수 있다. 이 헬퍼는
+    명령행 사용성을 유연하게 유지하면서도, 요청한 그룹 컬럼이 없을 때는
+    명확한 오류를 낸다.
+    """
+
     lookup = {col.lower(): col for col in df.columns}
     resolved = lookup.get(requested.lower())
     if resolved is None:
@@ -141,6 +165,14 @@ def resolve_column(df: pd.DataFrame, requested: str) -> str:
 
 
 def add_trig_features(df: pd.DataFrame) -> pd.DataFrame:
+    """원형 AIS 각도 컬럼에 sine/cosine 인코딩을 추가한다.
+
+    COG와 heading은 360도에서 다시 0도로 이어지므로, 원시 숫자로만 다루면
+    실제로 가까운 359도와 1도가 멀리 떨어진 값처럼 보인다. 삼각함수 특징은
+    이런 원형 구조를 보존한다. 원본 각도 컬럼이 있고 파생 컬럼이 아직 없을
+    때만 새로 추가한다.
+    """
+
     df = df.copy()
     for angle_col in ["cog", "heading"]:
         if angle_col not in df.columns:
@@ -162,6 +194,15 @@ def group_train_test_split(
     groups: pd.Series,
     test_size: float,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series, pd.Series, pd.Series, str]:
+    """각 MMSI가 train 또는 test 한쪽에만 속하도록 행을 분할한다.
+
+    선호하는 splitter는 StratifiedGroupKFold다. 선박 그룹 경계를 지키면서도
+    선박 종류 클래스 분포를 최대한 보존하기 때문이다. 데이터가 너무 작거나
+    이 전략을 쓰기에 충분히 다양하지 않으면 GroupShuffleSplit으로
+    fallback한다. 이 경우 클래스 균형은 약해질 수 있지만 누수 경계는 여전히
+    유지된다.
+    """
+
     test_size = min(max(test_size, 0.05), 0.5)
     n_splits = max(2, int(round(1.0 / test_size)))
     group_counts = groups.value_counts()
@@ -202,6 +243,14 @@ def evaluate_specs(
     y_test: pd.Series,
     model_names: list[str],
 ) -> tuple[list[dict[str, Any]], dict[str, str]]:
+    """요청된 모든 모델 spec을 그룹 홀드아웃에서 학습하고 평가한다.
+
+    후보 파이프라인은 공통 ``ship_type_model`` 팩토리에서 생성하므로 기존
+    학습기와 전처리가 일관된다. 결과는 정확도를 우선으로, macro F1을
+    다음 기준으로 정렬한다. macro F1을 정렬 키에 포함하면 소수 선박 종류를
+    더 잘 처리하는 모델이 동률을 깰 수 있다.
+    """
+
     categorical_cols, numeric_cols = split_columns(x_train)
     specs, skipped = model_specs(categorical_cols, numeric_cols, set(model_names))
     results: list[dict[str, Any]] = []
@@ -221,6 +270,14 @@ def fit_spec_with_predictions(
     y_train: pd.Series,
     y_test: pd.Series,
 ) -> dict[str, Any]:
+    """후보 하나를 학습하고 지표와 오분류 상세를 반환한다.
+
+    공통 ``fit_spec`` 헬퍼와 같은 흐름이지만, 보고용 confusion-pair 행도
+    보관한다. 선택적 라벨 인코딩은 숫자 클래스 ID가 필요한 estimator에만
+    적용하며, 모든 report가 원래 선박 종류 라벨을 쓰도록 지표 계산 전에
+    예측값을 복원한다.
+    """
+
     label_encoder: LabelEncoder | None = None
     fit_y: pd.Series | np.ndarray = y_train
 
@@ -253,6 +310,14 @@ def confusion_pair_rows(
     model_name: str,
     display_name: str,
 ) -> list[dict[str, Any]]:
+    """혼동 행렬에서 실제값-예측값 오류 쌍을 정렬해 반환한다.
+
+    이 CSV는 모델이 어떤 클래스를 혼동하는지 강조하기 위한 것이므로 정답
+    예측은 제외한다. 각 행에는 실제 클래스의 support와 해당 클래스 안에서의
+    오류율도 포함한다. 이를 통해 자주 발생하는 작은 실수와 희귀 클래스의
+    심각한 실패를 구분할 수 있다.
+    """
+
     labels = sorted(set(y_true.astype(str)).union(set(map(str, y_pred))))
     cm = confusion_matrix(y_true, y_pred, labels=labels)
     rows: list[dict[str, Any]] = []
@@ -277,6 +342,12 @@ def confusion_pair_rows(
 
 
 def class_metric_rows(metrics: dict[str, Any]) -> list[dict[str, Any]]:
+    """sklearn의 클래스별 classification report를 CSV 행으로 평탄화한다.
+
+    이 내보내기는 보고서나 대시보드에서 클래스별로 살펴보기 위한 것이므로,
+    accuracy, macro avg, weighted avg 같은 집계 섹션은 제외한다.
+    """
+
     report = metrics.get("classification_report", {})
     rows: list[dict[str, Any]] = []
     for label, values in report.items():
@@ -302,6 +373,14 @@ def random_split_baseline(
     model_names: list[str],
     test_size: float,
 ) -> tuple[list[dict[str, Any]], dict[str, str]]:
+    """그룹 분할과 비교하기 위해 기존 행 단위 분할을 실행한다.
+
+    행 단위 분할은 같은 선박의 포인트를 train과 test 양쪽에 배치할 수 있어,
+    처음 보는 선박에 대한 실제 성능보다 좋아 보일 수 있다. 이 함수는
+    선택 실행이며, 호출자가 명시적으로 비교를 요청할 때만 기준선 지표를
+    기록한다.
+    """
+
     x_train, x_test, y_train, y_test = train_test_split(
         x,
         y,
@@ -316,6 +395,8 @@ def leakage_report(
     train_groups: pd.Series,
     test_groups: pd.Series,
 ) -> dict[str, Any]:
+    """선박 그룹이 홀드아웃 경계를 넘어갔는지 요약한다."""
+
     train_set = set(train_groups.astype(str))
     test_set = set(test_groups.astype(str))
     overlap = train_set.intersection(test_set)
@@ -328,6 +409,8 @@ def leakage_report(
 
 
 def class_counts(y: pd.Series) -> dict[str, int]:
+    """분할 진단에 쓸 안정적이고 JSON 친화적인 클래스 개수를 반환한다."""
+
     return {str(label): int(count) for label, count in y.value_counts().sort_index().items()}
 
 
@@ -339,6 +422,15 @@ def train_deploy_bundle(
     skipped: dict[str, str],
     split_info: dict[str, Any],
 ) -> dict[str, Any]:
+    """그룹 분할에서 선택된 모델을 재학습하고 저장 산출물을 만든다.
+
+    평가는 MMSI 그룹 홀드아웃에서 수행하지만, 모델 계열을 선택한 뒤 배포에는
+    사용 가능한 모든 라벨 데이터를 쓰는 편이 좋다. 이 함수는 winning model
+    spec을 다시 만들고 전체 특징 행렬에 재학습한 뒤, estimator, 특징 스키마,
+    라벨 encoder, 지표, 그리고 MMSI가 모델 특징이 아니라 분할 용도로만
+    쓰였음을 설명하는 평가 메타데이터를 함께 저장한다.
+    """
+
     categorical_cols, numeric_cols = split_columns(x)
     fresh_specs, _ = model_specs(categorical_cols, numeric_cols, {best_metrics["model_name"]})
     if not fresh_specs:
@@ -372,6 +464,8 @@ def train_deploy_bundle(
 
 
 def main() -> None:
+    """그룹 분할 학습, 보고, 내보내기 전체 워크플로를 실행한다."""
+
     args = parse_args()
     df = add_trig_features(load_type_data(args.data.resolve()))
     group_col = resolve_column(df, args.group_col)

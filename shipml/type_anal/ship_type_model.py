@@ -1,3 +1,14 @@
+"""AIS 선박 종류 분류기 학습과 추론에 쓰이는 공통 유틸리티.
+
+이 모듈은 선박 종류 모델을 만드는 중심 팩토리 역할을 한다. 특징 CSV를
+읽고, 전처리 파이프라인을 만들고, 후보 분류기를 정의한 뒤, 홀드아웃
+분할에서 가장 좋은 후보를 고른다. 이후 배포용으로 선택 모델을 전체
+데이터에 다시 학습시키고, 다른 스크립트가 재사용할 수 있는 joblib 번들로
+저장한다. 이 파일의 기존 행 단위 분할 방식은 호환성을 위해 유지되어
+있으며, 그룹 분할 스크립트들은 같은 헬퍼를 가져다 쓰면서 MMSI 기준
+평가로 선박 누수를 줄인다.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -31,6 +42,15 @@ RANDOM_STATE = 42
 
 @dataclass(frozen=True)
 class ModelSpec:
+    """하나의 후보 분류기를 설명하는 선언형 설정 객체.
+
+    코드에서는 단순 estimator 객체만 넘기지 않고 ModelSpec을 사용한다.
+    이렇게 하면 각 후보가 사용자에게 보여줄 이름, 학습할 sklearn Pipeline,
+    그리고 학습 전에 타깃 라벨을 정수 ID로 바꿔야 하는지 여부를 함께
+    가진다. XGBoost는 내부적으로 숫자 클래스 ID를 사용하지만, 일반
+    sklearn 분류기들은 원래의 문자열 선박 종류 라벨을 바로 사용할 수 있다.
+    """
+
     name: str
     display_name: str
     estimator: Pipeline
@@ -38,6 +58,13 @@ class ModelSpec:
 
 
 def parse_args() -> argparse.Namespace:
+    """기존 행 단위 분할 모델 생성기의 CLI 옵션을 파싱한다.
+
+    인자는 입력 CSV, 출력 산출물 위치, 후보 모델 이름, 홀드아웃 비율을
+    지정한다. 데이터셋 컬럼이나 타깃 라벨에 의존하는 검증은 실제 데이터를
+    읽은 뒤에 수행하므로, 여기서는 단순한 인자 파싱만 담당한다.
+    """
+
     parser = argparse.ArgumentParser(
         description="Train and save the best practical AIS ship-type classifier."
     )
@@ -78,6 +105,15 @@ def parse_args() -> argparse.Namespace:
 
 
 def load_type_data(path: Path) -> pd.DataFrame:
+    """AIS 선박 종류 특징 테이블을 읽고 정규화한다.
+
+    타깃 컬럼은 반드시 있어야 하며, 앞뒤 공백을 제거한 문자열 라벨로
+    유지한다. 타깃과 명시적 범주형 컬럼을 제외한 모든 컬럼은 숫자로
+    변환하여, 이후 imputer가 누락값이나 잘못된 값을 일관되게 처리할 수
+    있게 한다. 선박 종류가 없는 예시는 지도학습에 사용할 수 없으므로
+    제거한다.
+    """
+
     if not path.exists():
         raise FileNotFoundError(f"Ship-type data not found: {path}")
 
@@ -94,6 +130,14 @@ def load_type_data(path: Path) -> pd.DataFrame:
 
 
 def split_columns(x: pd.DataFrame) -> tuple[list[str], list[str]]:
+    """특징 컬럼을 범주형 그룹과 숫자형 그룹으로 나눈다.
+
+    sklearn의 ColumnTransformer는 명시적인 컬럼 목록이 필요하다. object 타입
+    컬럼은 범주형으로 보고 결측값 대체와 원-핫 인코딩을 거친다. 그 외
+    컬럼은 숫자형으로 보고 중앙값 대체를 수행하며, 모델 계열에 따라
+    선택적으로 스케일링을 적용한다.
+    """
+
     categorical_cols = x.select_dtypes(include=["object"]).columns.tolist()
     numeric_cols = [col for col in x.columns if col not in categorical_cols]
     return categorical_cols, numeric_cols
@@ -104,6 +148,19 @@ def make_preprocessor(
     numeric_cols: list[str],
     scale_numeric: bool,
 ) -> ColumnTransformer:
+    """모든 분류기 파이프라인이 공유하는 전처리 단계를 만든다.
+
+    AIS 데이터에는 선박 치수나 운항값이 비어 있는 경우가 많으므로 숫자형
+    컬럼은 중앙값으로 결측값을 대체한다. 선형, 거리 기반, 커널 모델은
+    크기가 다른 특징이 최적화를 지배하지 않도록 스케일링을 요구한다.
+    트리 기반 모델은 단조 스케일 변환에 분할 기준이 크게 영향을 받지
+    않으므로 불필요한 스케일링을 생략한다.
+
+    범주형 컬럼은 최빈값 대체와 원-핫 인코딩을 사용한다.
+    ``handle_unknown="ignore"``를 지정해, 추론 시 학습 때 없던 운항 상태
+    범주가 들어와도 예측이 계속 진행되도록 한다.
+    """
+
     if scale_numeric:
         numeric_transformer: Any = Pipeline(
             steps=[
@@ -136,9 +193,22 @@ def model_specs(
     numeric_cols: list[str],
     requested: set[str],
 ) -> tuple[list[ModelSpec], dict[str, str]]:
+    """호출자가 요청한 후보 모델 파이프라인들을 만든다.
+
+    반환되는 각 ModelSpec은 전처리 단계와 분류기 단계를 포함한 완전한
+    sklearn Pipeline을 가진다. 선택 의존성이 없거나 알 수 없는 모델 이름이
+    들어오면 전체 실행을 실패시키지 않고 ``skipped``에 이유를 기록한다.
+    덕분에 현재 환경에서 사용할 수 있는 후보만 비교할 수 있다.
+
+    후보들은 의도적으로 같은 전처리 헬퍼를 공유한다. 이렇게 해야 결측값
+    처리나 범주형 인코딩 차이가 아니라 estimator 자체의 성능 차이를 비교할
+    수 있다.
+    """
+
     specs: list[ModelSpec] = []
     skipped: dict[str, str] = {}
 
+    # 선형 기준 모델: 빠르고 해석하기 쉬우며 숫자형 특징 스케일링이 필요하다.
     if "logistic_regression" in requested:
         specs.append(
             ModelSpec(
@@ -156,6 +226,7 @@ def model_specs(
             )
         )
 
+    # 표 형태 AIS 특징에 강한 실용 기본값이며 숫자형 스케일링이 필요 없다.
     if "random_forest" in requested:
         specs.append(
             ModelSpec(
@@ -178,6 +249,7 @@ def model_specs(
             )
         )
 
+    # 소프트 보팅 앙상블은 선형 모델과 트리 모델을 섞어 더 안정적인 후보를 만든다.
     if "voting" in requested:
         specs.append(
             ModelSpec(
@@ -225,6 +297,7 @@ def model_specs(
             )
         )
 
+    # 선택적 그래디언트 부스팅 트리 모델이며 xgboost가 없으면 조용히 건너뛴다.
     if "xgboost" in requested:
         try:
             from xgboost import XGBClassifier
@@ -262,6 +335,7 @@ def model_specs(
                 )
             )
 
+    # 거리 기반 기준 모델: KNN은 특징 거리 계산을 사용하므로 스케일링이 필수다.
     if "knn" in requested:
         from sklearn.neighbors import KNeighborsClassifier
 
@@ -286,6 +360,7 @@ def model_specs(
             )
         )
 
+    # 커널 SVM은 정확할 수 있지만 이 데이터셋에서는 비용이 커서 선택 실행으로 둔다.
     if "svc" in requested:
         from sklearn.svm import SVC
 
@@ -327,6 +402,19 @@ def fit_spec(
     y_train: pd.Series,
     y_test: pd.Series,
 ) -> tuple[Pipeline, LabelEncoder | None, dict[str, Any]]:
+    """후보 모델 하나를 학습하고 홀드아웃 분할에서 평가한다.
+
+    이 함수는 estimator별 차이 하나를 숨겨준다. XGBoost는 정수 클래스 ID를
+    기대하지만, 대부분의 sklearn 분류기는 문자열 라벨을 그대로 받는다.
+    라벨 인코딩을 사용하는 경우에는 지표 계산 전에 예측값을 다시 선박 종류
+    문자열로 복원하여 모든 후보를 같은 라벨 공간에서 비교한다.
+
+    반환 지표에는 집계 점수와 전체 classification report가 포함된다. 학습된
+    estimator도 튜플에 포함되지만, 배포 경로에서는 선택 모델을 새로 만들고
+    전체 행에 다시 학습시키므로 저장 산출물에는 홀드아웃 학습 상태가
+    남지 않는다.
+    """
+
     label_encoder: LabelEncoder | None = None
     fit_y: pd.Series | np.ndarray = y_train
 
@@ -356,6 +444,15 @@ def refit_full(
     x: pd.DataFrame,
     y: pd.Series,
 ) -> tuple[Pipeline, LabelEncoder | None]:
+    """선택된 후보를 사용 가능한 모든 라벨 행에 다시 학습한다.
+
+    평가는 홀드아웃 분할로 수행하지만, 모델 계열이 선택된 뒤의 배포 모델은
+    전체 데이터셋에서 학습하는 편이 좋다. 이 함수는 ``fit_spec``과 같은
+    선택적 라벨 인코딩 로직을 반복하고, 학습된 Pipeline과 추론 시 숫자
+    예측값을 원래 선박 종류 라벨로 되돌리는 데 필요한 encoder를 함께
+    반환한다.
+    """
+
     label_encoder: LabelEncoder | None = None
     fit_y: pd.Series | np.ndarray = y
     if spec.requires_label_encoding:
@@ -372,6 +469,19 @@ def train_best_model(
     requested_models: list[str] | None = None,
     test_size: float = 0.2,
 ) -> dict[str, Any]:
+    """후보 분류기를 학습하고, 최적 모델을 고른 뒤 번들로 저장한다.
+
+    기존 워크플로는 stratified 행 단위 분할로 후보 모델을 정확도와 macro F1
+    기준으로 비교한다. 가장 좋은 ModelSpec을 선택한 뒤에는 해당 estimator를
+    새로 만들어 전체 특징 테이블에 학습시키고, 이후 예측 코드에 필요한
+    메타데이터와 함께 저장한다.
+
+    반환 및 저장되는 번들에는 estimator, 선택적 라벨 encoder, 특징 스키마,
+    타깃 클래스, 모든 후보 지표, 건너뛴 모델의 이유, 타임스탬프가 포함된다.
+    다운스트림 코드는 원시 Pipeline 대신 이 번들을 사용해야 학습 때의 특징
+    순서와 라벨 복원 동작을 정확히 재현할 수 있다.
+    """
+
     df = load_type_data(data_path)
     x = df.drop(columns=[TARGET])
     y = df[TARGET]
@@ -405,7 +515,7 @@ def train_best_model(
     if best_spec is None:
         raise RuntimeError("No ship-type model could be fitted.")
 
-    # Recreate the chosen estimator so the saved model is cleanly fitted on all data.
+    # 저장 모델이 전체 데이터에 깔끔하게 학습되도록 선택 estimator를 새로 만든다.
     fresh_specs, _ = model_specs(categorical_cols, numeric_cols, {best_spec.name})
     final_estimator, final_label_encoder = refit_full(fresh_specs[0], x, y)
     best_metrics = next(item for item in results if item["model_name"] == best_spec.name)
@@ -435,6 +545,14 @@ def train_best_model(
 
 
 def save_json(path: Path, data: dict[str, Any]) -> None:
+    """numpy 값을 표준 Python 객체로 바꿔 JSON을 저장한다.
+
+    지표 딕셔너리에는 pandas/sklearn이 만든 numpy scalar나 배열이 들어가는
+    경우가 많다. ``json.dumps``는 이를 직접 직렬화할 수 없으므로, 이 헬퍼가
+    흔한 numpy 컨테이너를 변환한다. 출력 파일의 한글 등 비 ASCII 라벨은
+    읽을 수 있는 형태로 유지한다.
+    """
+
     def default(value: Any) -> Any:
         if isinstance(value, (np.integer, np.floating)):
             return value.item()
@@ -449,6 +567,14 @@ def save_json(path: Path, data: dict[str, Any]) -> None:
 
 
 def metrics_summary(bundle: dict[str, Any]) -> dict[str, Any]:
+    """전체 모델 번들에서 간결한 지표 JSON을 만든다.
+
+    sklearn classification report 전체는 크기가 클 수 있고 이미 joblib 번들에
+    포함되어 있다. 이 요약은 긴 report 블록을 제거하되, 대시보드나 빠른
+    확인에 필요한 모델 식별 정보, 특징 스키마, 후보 점수, 건너뛴 모델,
+    선택적 평가 메타데이터는 유지한다.
+    """
+
     best_metrics = {
         key: value
         for key, value in bundle["best_metrics"].items()
@@ -480,6 +606,13 @@ def load_or_train_model(
     force_train: bool = False,
     requested_models: list[str] | None = None,
 ) -> dict[str, Any]:
+    """기존 모델 번들을 읽거나, 요청 시 새 모델을 학습한다.
+
+    예측이 필요하지만 joblib 산출물이 이미 있는지 신경 쓰고 싶지 않은
+    스크립트를 위한 편의 진입점이다. ``force_train=True``를 넘기면 캐시를
+    무시하고 현재 CSV와 요청 후보 목록으로 번들을 다시 만든다.
+    """
+
     if model_path.exists() and not force_train:
         return joblib.load(model_path)
     return train_best_model(
@@ -494,6 +627,16 @@ def predict_ship_types(
     bundle: dict[str, Any],
     features: pd.DataFrame,
 ) -> tuple[np.ndarray, np.ndarray]:
+    """선박 종류 라벨과 신뢰도처럼 사용할 확률값을 예측한다.
+
+    항로에서 파생된 입력 특징에는 학습 때 존재하던 컬럼이 빠져 있을 수 있다.
+    이 함수는 없는 컬럼을 NaN으로 추가하고, 저장된 특징 스키마와 같은 순서로
+    DataFrame을 재정렬한 뒤, Pipeline의 imputer가 결측값을 채우게 한다.
+    모델이 라벨 encoder를 사용했다면 숫자 예측값을 원래 라벨로 복원한다.
+    확률 출력은 가능할 때 최대 클래스 확률이며, ``predict_proba``가 없는
+    estimator에서는 NaN을 반환한다.
+    """
+
     x = features.copy()
     for col in bundle["feature_columns"]:
         if col not in x.columns:
@@ -515,6 +658,14 @@ def predict_ship_types(
 
 
 def bearing_degrees(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """한 좌표쌍에서 다른 좌표쌍으로 향하는 초기 방위각을 반환한다.
+
+    항로 요약에는 원본 AIS COG 값이 항상 있지 않으므로, 이 헬퍼는 시작/끝
+    좌표에서 heading처럼 사용할 각도를 만든다. 좌표가 없으면 0도를 반환해
+    특징 생성이 중단되지 않게 하고, 이후 imputer/model이 중립적인 fallback을
+    처리하도록 둔다.
+    """
+
     if any(pd.isna(value) for value in [lat1, lon1, lat2, lon2]):
         return 0.0
     lat1_rad = math.radians(float(lat1))
@@ -528,6 +679,16 @@ def bearing_degrees(lat1: float, lon1: float, lat2: float, lon2: float) -> float
 
 
 def route_rows_to_type_features(routes: pd.DataFrame, feature_columns: list[str]) -> pd.DataFrame:
+    """항로 예측 행을 선박 종류 분류기 특징으로 변환한다.
+
+    선박 종류 모델은 AIS 점 단위와 비슷한 특징으로 학습되지만, 항로 예측
+    출력은 선박 단위 요약이다. 이 adapter는 항로 요약에서 필요한 컬럼을
+    합성한다. ``mean_sog``에서 속도를, 항로 방위각에서 heading/course를,
+    항로 메타데이터에서 선박 치수를, 파생 방위각에서 삼각함수 각도 특징을
+    만든다. 저장 번들이 기대하지만 항로 데이터에 없는 특징은 NaN으로
+    추가해, 학습 때와 같은 imputation 규칙이 결측값을 처리하도록 한다.
+    """
+
     bearings = routes.apply(
         lambda row: bearing_degrees(
             row.get("start_lat"),
@@ -559,6 +720,8 @@ def route_rows_to_type_features(routes: pd.DataFrame, feature_columns: list[str]
 
 
 def main() -> None:
+    """기존 선박 종류 모델을 학습하고 저장하는 CLI 진입점."""
+
     args = parse_args()
     bundle = train_best_model(
         data_path=args.data.resolve(),
