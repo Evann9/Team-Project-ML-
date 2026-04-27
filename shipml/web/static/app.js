@@ -46,6 +46,12 @@ const modelMacroF1 = document.getElementById("modelMacroF1");
 const modelMethod = document.getElementById("modelMethod");
 const modelNote = document.getElementById("modelNote");
 const futureModelNote = document.getElementById("futureModelNote");
+const routeAccuracy = document.getElementById("routeAccuracy");
+const routeMacroF1 = document.getElementById("routeMacroF1");
+const routeStrictAccuracy = document.getElementById("routeStrictAccuracy");
+const routeTemporalAccuracy = document.getElementById("routeTemporalAccuracy");
+const routeModelNote = document.getElementById("routeModelNote");
+const futureBaselineNote = document.getElementById("futureBaselineNote");
 const routeList = document.getElementById("routeList");
 const performanceList = document.getElementById("performanceList");
 const confusionList = document.getElementById("confusionList");
@@ -59,6 +65,7 @@ async function init() {
   state.performance = await performanceResponse.json();
   populateFilters(state.summary);
   setModelSummary(state.summary.model);
+  setRouteModelSummary(state.summary.routeModel);
   setFutureModelSummary(state.summary.futureModel);
   renderPerformance(state.performance);
   await refreshMap();
@@ -102,9 +109,29 @@ function setModelSummary(model) {
   modelNote.textContent = [overlap, rows].filter(Boolean).join(" · ") || "평가 정보 없음";
 }
 
+function setRouteModelSummary(model) {
+  routeAccuracy.textContent = formatPercent(model?.accuracy);
+  routeMacroF1.textContent = formatPercent(model?.macroF1);
+  routeStrictAccuracy.textContent = formatPercent(model?.strictAccuracy);
+  routeTemporalAccuracy.textContent = formatPercent(model?.temporalAccuracy);
+
+  if (!model?.available) {
+    routeModelNote.textContent = "항로 검증 정보 없음";
+    return;
+  }
+  const earlyWindow =
+    typeof model.earlyWindowHours === "number" ? `초기 ${model.earlyWindowHours}h` : "초기 관측";
+  const classes =
+    typeof model.routeClasses === "number" ? `항로 ${numberText(model.routeClasses)}개` : "";
+  const anomalies =
+    typeof model.anomalyCount === "number" ? `이상 ${numberText(model.anomalyCount)}척` : "";
+  routeModelNote.textContent = [earlyWindow, classes, anomalies].filter(Boolean).join(" · ");
+}
+
 function setFutureModelSummary(model) {
   if (!model?.available) {
     futureModelNote.textContent = "미래 좌표 모델: 아직 학습 전";
+    futureBaselineNote.textContent = "baseline 정보 없음";
     return;
   }
   const horizons = Array.isArray(model.horizons) && model.horizons.length > 0
@@ -113,6 +140,22 @@ function setFutureModelSummary(model) {
   const error =
     typeof model.meanErrorKm === "number" ? `평균 오차 ${model.meanErrorKm.toFixed(2)}km` : "오차 정보 없음";
   futureModelNote.textContent = `미래 좌표 모델: ${horizons} · ${error}`;
+  futureBaselineNote.textContent = futureBaselineText(model);
+}
+
+function futureBaselineText(model) {
+  const errors = model?.errorsKm || {};
+  const dead = model?.baselineErrorsKm?.dead_reckoning || {};
+  const keys = Object.keys(errors);
+  if (keys.length === 0) {
+    return "미래 위치 baseline 정보 없음";
+  }
+  const parts = keys.slice(0, 3).map((key) => {
+    const modelError = typeof errors[key] === "number" ? `${errors[key].toFixed(2)}km` : "-";
+    const deadError = typeof dead[key] === "number" ? `${dead[key].toFixed(2)}km` : "-";
+    return `${key} ${modelError} / DR ${deadError}`;
+  });
+  return parts.join(" · ");
 }
 
 async function refreshMap() {

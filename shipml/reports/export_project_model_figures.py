@@ -99,6 +99,7 @@ def save_model_score_summary(
     ship_best = type_metrics.get("best_metrics", {})
     route_metrics = route_summary.get("metrics", {})
     future_errors = future_metrics.get("holdout_mean_error_km", {})
+    future_baselines = future_metrics.get("holdout_baseline_mean_error_km", {})
 
     labels = ["선종 분류\n정확도", "선종 분류\n매크로 F1", "항로 분류\n정확도", "항로 분류\n매크로 F1"]
     values = [
@@ -123,13 +124,42 @@ def save_model_score_summary(
 
     future_keys = list(future_errors.keys())
     future_labels = [label_horizon(key) for key in future_keys]
-    future_values = [float(future_errors[key]) for key in future_keys]
-    axes[1].bar(future_labels, future_values, color="#be185d")
+    future_series: list[tuple[str, dict[str, Any], str]] = [
+        ("RF+DR 앙상블", future_errors, "#be185d")
+    ]
+    rf_errors = future_metrics.get("holdout_random_forest_mean_error_km", {})
+    if rf_errors:
+        future_series.append(("RandomForest", rf_errors, "#2563eb"))
+    baseline_labels = {
+        "constant_position": ("현재 위치 유지", "#64748b"),
+        "dead_reckoning": ("등속 직선", "#f59e0b"),
+    }
+    for key, (label, color) in baseline_labels.items():
+        errors = future_baselines.get(key, {})
+        if errors:
+            future_series.append((label, errors, color))
+
+    x = np.arange(len(future_keys))
+    width = min(0.24, 0.78 / max(len(future_series), 1))
+    for series_idx, (series_label, errors, color) in enumerate(future_series):
+        offset = (series_idx - (len(future_series) - 1) / 2.0) * width
+        values = [float(errors.get(key, np.nan)) for key in future_keys]
+        axes[1].bar(x + offset, values, width=width, color=color, label=series_label)
+        for idx, value in enumerate(values):
+            if np.isfinite(value):
+                axes[1].text(
+                    x[idx] + offset,
+                    value + 0.12,
+                    f"{value:.2f}",
+                    ha="center",
+                    fontsize=8,
+                )
+    axes[1].set_xticks(x, future_labels)
     axes[1].set_title("미래 좌표 예측 평균 오차")
     axes[1].set_ylabel("평균 오차 (km)")
     axes[1].grid(axis="y", alpha=0.25)
-    for idx, value in enumerate(future_values):
-        axes[1].text(idx, value + 0.12, f"{value:.2f} km", ha="center", fontsize=9)
+    if len(future_series) > 1:
+        axes[1].legend(fontsize=8)
 
     fig.suptitle("ShipML 주요 모델 결과 요약", fontsize=15, fontweight="bold")
     fig.tight_layout()

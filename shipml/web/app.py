@@ -21,6 +21,7 @@ DEFAULT_RAW_PREDICTIONS = ROUTE_OUTPUTS / "route_predictions.csv"
 DEFAULT_ROUTE_CENTERS = ROUTE_OUTPUTS / "route_centers_long.csv"
 DEFAULT_AIS_POINTS = SHIPML_DIR / "route_anal" / "ais_data_10day.csv"
 DEFAULT_TYPE_SUMMARY = ROUTE_OUTPUTS / "route_type_summary.json"
+DEFAULT_ROUTE_RUN_SUMMARY = ROUTE_OUTPUTS / "run_summary.json"
 DEFAULT_FUTURE_PREDICTIONS = ROUTE_OUTPUTS / "future_position_forecast.csv"
 DEFAULT_FUTURE_METRICS = ROUTE_OUTPUTS / "future_position_regressor_metrics.json"
 DEFAULT_CLASS_METRICS = TYPE_OUTPUTS / "ship_type_classifier_class_metrics.csv"
@@ -73,6 +74,7 @@ def create_app() -> Flask:
                 "routes": routes,
                 "bounds": dataframe_bounds(predictions, centers),
                 "model": load_model_summary(),
+                "routeModel": load_route_model_summary(),
                 "futureModel": load_future_model_summary(),
                 "totalShips": int(len(predictions)),
             }
@@ -312,6 +314,9 @@ def load_future_model_summary() -> dict[str, Any]:
         }
 
     errors = data.get("holdout_mean_error_km", {})
+    rf_errors = data.get("holdout_random_forest_mean_error_km", {})
+    baselines = data.get("holdout_baseline_mean_error_km", {})
+    temporal = data.get("temporal_holdout", {})
     numeric_errors = [
         float(value)
         for value in errors.values()
@@ -323,6 +328,39 @@ def load_future_model_summary() -> dict[str, Any]:
         "meanErrorKm": sum(numeric_errors) / len(numeric_errors) if numeric_errors else None,
         "horizons": data.get("horizons_hours", []),
         "evaluationMethod": data.get("evaluation_method"),
+        "errorsKm": errors,
+        "randomForestErrorsKm": rf_errors,
+        "baselineErrorsKm": baselines,
+        "ensembleWeights": data.get("ensemble_rf_weight_by_horizon", {}),
+        "temporalHoldout": temporal,
+    }
+
+
+def load_route_model_summary() -> dict[str, Any]:
+    path = data_path("ROUTE_RUN_SUMMARY_JSON", DEFAULT_ROUTE_RUN_SUMMARY)
+    if not path.exists():
+        return {"available": False}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {"available": False}
+
+    metrics = data.get("metrics", {})
+    strict = data.get("strict_route_evaluation", {})
+    temporal = data.get("temporal_route_evaluation", {})
+    return {
+        "available": True,
+        "routeClasses": data.get("route_classes"),
+        "labelSource": data.get("label_source"),
+        "featureScope": data.get("classifier_feature_scope"),
+        "earlyWindowHours": data.get("early_window_hours"),
+        "accuracy": metrics.get("holdout_accuracy"),
+        "macroF1": metrics.get("holdout_f1_macro"),
+        "strictAccuracy": strict.get("accuracy") if strict.get("available") else None,
+        "strictMacroF1": strict.get("macro_f1") if strict.get("available") else None,
+        "temporalAccuracy": temporal.get("accuracy") if temporal.get("available") else None,
+        "temporalMacroF1": temporal.get("macro_f1") if temporal.get("available") else None,
+        "anomalyCount": data.get("anomaly_count"),
     }
 
 

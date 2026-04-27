@@ -112,9 +112,20 @@ def build_summary(routes: pd.DataFrame, bundle: dict[str, Any]) -> dict[str, Any
         .sort_values(["predicted_shiptype", "vessel_count"], ascending=[True, False])
         .to_dict("records")
     )
+    calibration = bundle.get("probability_calibration", {})
+    probability_note = (
+        "predicted_shiptype_probability is calibrated with "
+        f"{calibration.get('method', 'a saved calibration model')}."
+        if calibration
+        else (
+            "predicted_shiptype_probability is an uncalibrated model confidence "
+            "score unless the saved classifier was calibrated separately."
+        )
+    )
     return {
         "rows": int(len(routes)),
         "model": metrics_summary(bundle),
+        "probability_note": probability_note,
         "shiptype_counts": type_counts,
         "route_type_counts": route_type_counts,
     }

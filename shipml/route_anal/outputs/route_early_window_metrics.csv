@@ -1,0 +1,5 @@
+﻿early_window_hours,vessels,feature_count,route_classes,holdout_accuracy,holdout_f1_macro,evaluation_label_source
+1.0,3414,77,12,0.821376281112738,0.815238117031956,full_route_catalog_for_window_sensitivity
+3.0,3414,77,12,0.828696925329429,0.8210977617843106,full_route_catalog_for_window_sensitivity
+6.0,3414,77,12,0.8506588579795022,0.8503716495868235,full_route_catalog_for_window_sensitivity
+12.0,3414,77,12,0.8857979502196194,0.885260130483457,full_route_catalog_for_window_sensitivity

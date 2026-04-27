@@ -1,7 +1,7 @@
 {
   "model_name": "random_forest_regressor",
-  "display_name": "RandomForestRegressor",
-  "created_at": "2026-04-25T12:23:33.987261+00:00",
+  "display_name": "RandomForest + Dead-Reckoning Ensemble",
+  "created_at": "2026-04-27T12:49:27.607971+00:00",
   "evaluation_method": "MMSI GroupShuffleSplit holdout",
   "horizons_hours": [
     1,
@@ -11,7 +11,7 @@
   "rows": {
     "supervised": 333472,
     "train": 267925,
-    "train_used_for_fit": 140030,
+    "train_used_for_fit": 180031,
     "test": 65547
   },
   "groups": {
@@ -20,18 +20,58 @@
     "overlap": 0
   },
   "holdout_mean_error_km": {
-    "1h": 2.8025085289955403,
-    "2h": 3.87788050144509,
-    "3h": 5.240671611191138
+    "1h": 1.5482676300400786,
+    "2h": 3.162727192554938,
+    "3h": 4.616417864832739
+  },
+  "holdout_random_forest_mean_error_km": {
+    "1h": 2.3072348171661274,
+    "2h": 3.417039859767455,
+    "3h": 4.780515133127814
+  },
+  "holdout_baseline_mean_error_km": {
+    "constant_position": {
+      "1h": 2.971487733286196,
+      "2h": 5.638503669803212,
+      "3h": 8.128843870381377
+    },
+    "dead_reckoning": {
+      "1h": 1.5649512486190773,
+      "2h": 3.776545796098235,
+      "3h": 6.264447423419413
+    }
+  },
+  "holdout_error_reduction_vs_baseline_pct": {
+    "constant_position": {
+      "1h": 47.895876779278,
+      "2h": 43.90839524512858,
+      "3h": 43.209416511819995
+    },
+    "dead_reckoning": {
+      "1h": 1.0660791250667023,
+      "2h": 16.253439960332745,
+      "3h": 26.307660471785177
+    }
+  },
+  "holdout_error_reduction_vs_random_forest_pct": {
+    "1h": 32.895099427211925,
+    "2h": 7.442484654827059,
+    "3h": 3.432627315786966
   },
   "holdout_mae_degrees": {
-    "target_lat_1h": 0.01732021546177828,
-    "target_lon_1h": 0.025615336378804848,
-    "target_lat_2h": 0.023135142995818682,
-    "target_lon_2h": 0.03783317254238383,
-    "target_lat_3h": 0.030904513977539804,
-    "target_lon_3h": 0.05205958390653211
+    "target_lat_1h": 0.009827712436561574,
+    "target_lon_1h": 0.01399159507861401,
+    "target_lat_2h": 0.018519099335152365,
+    "target_lon_2h": 0.03137038706196624,
+    "target_lat_3h": 0.026363688193032985,
+    "target_lon_3h": 0.04724280709077956
   },
+  "ensemble_rf_weight_by_horizon": {
+    "1h": 0.1,
+    "2h": 0.65,
+    "3h": 0.8500000000000001
+  },
+  "prediction_policy": "pred_lat_* and pred_lon_* use the validation-selected blend of RandomForest and dead-reckoning for each horizon.",
   "feature_columns": [
     "Latitude",
     "Longitude",
@@ -45,5 +85,48 @@
     "delta_lat",
     "delta_lon",
     "delta_hours"
-  ]
+  ],
+  "temporal_holdout": {
+    "available": true,
+    "method": "timestamp_ordered_80_20_holdout",
+    "train_rows": 266778,
+    "train_used_for_fit": 180026,
+    "test_rows": 66694,
+    "train_start": "2026-01-01T00:00:00",
+    "train_end": "2026-01-08T19:00:00",
+    "test_start": "2026-01-08T19:00:00",
+    "test_end": "2026-01-10T20:00:00",
+    "groups": {
+      "train": 3041,
+      "test": 1722,
+      "overlap": 1349
+    },
+    "ensemble_mean_error_km": {
+      "1h": 1.3141027282426463,
+      "2h": 2.396737157490962,
+      "3h": 3.4088141235281704
+    },
+    "random_forest_mean_error_km": {
+      "1h": 1.5754320707987095,
+      "2h": 2.403367460782118,
+      "3h": 3.4259294681015313
+    },
+    "baseline_mean_error_km": {
+      "constant_position": {
+        "1h": 2.8654882752025426,
+        "2h": 5.478818349869901,
+        "3h": 7.963872346932816
+      },
+      "dead_reckoning": {
+        "1h": 1.3698498834882193,
+        "2h": 3.302507628092557,
+        "3h": 5.557146568821975
+      }
+    },
+    "ensemble_rf_weight_by_horizon": {
+      "1h": 0.1,
+      "2h": 0.65,
+      "3h": 0.8500000000000001
+    }
+  }
 }

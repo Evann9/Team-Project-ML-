@@ -3,7 +3,7 @@
   "model": {
     "model_name": "random_forest",
     "display_name": "RandomForest",
-    "trained_at": "2026-04-25T11:38:56.180871+00:00",
+    "trained_at": "2026-04-27T12:54:17.853912+00:00",
     "train_rows": 316795,
     "target_classes": [
       "Cargo",
@@ -904,6 +904,494 @@
         ]
       },
       {
+        "model_name": "voting",
+        "display_name": "VotingClassifier",
+        "test_accuracy": 0.8458938780371605,
+        "macro_f1": 0.6283585518111243,
+        "weighted_f1": 0.8422784873519171,
+        "confusion_pairs": [
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Tanker",
+            "predicted": "Cargo",
+            "count": 5711,
+            "actual_support": 15085,
+            "actual_error_rate": 0.3785880013258204
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Cargo",
+            "predicted": "Tanker",
+            "count": 2236,
+            "actual_support": 39683,
+            "actual_error_rate": 0.05634654638006199
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Passenger",
+            "predicted": "Cargo",
+            "count": 612,
+            "actual_support": 3428,
+            "actual_error_rate": 0.17852975495915985
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Cargo",
+            "predicted": "Passenger",
+            "count": 237,
+            "actual_support": 39683,
+            "actual_error_rate": 0.0059723307209636365
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Dredging",
+            "predicted": "Cargo",
+            "count": 191,
+            "actual_support": 471,
+            "actual_error_rate": 0.40552016985138006
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Cargo",
+            "predicted": "Dredging",
+            "count": 145,
+            "actual_support": 39683,
+            "actual_error_rate": 0.0036539576140916766
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Towing",
+            "predicted": "Tug",
+            "count": 113,
+            "actual_support": 160,
+            "actual_error_rate": 0.70625
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Fishing",
+            "predicted": "Towing",
+            "count": 110,
+            "actual_support": 2846,
+            "actual_error_rate": 0.03865073787772312
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Military",
+            "predicted": "Dredging",
+            "count": 105,
+            "actual_support": 1605,
+            "actual_error_rate": 0.06542056074766354
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Tug",
+            "predicted": "Towing",
+            "count": 99,
+            "actual_support": 1182,
+            "actual_error_rate": 0.08375634517766498
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Passenger",
+            "predicted": "Tanker",
+            "count": 90,
+            "actual_support": 3428,
+            "actual_error_rate": 0.026254375729288213
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Military",
+            "predicted": "Sailing",
+            "count": 80,
+            "actual_support": 1605,
+            "actual_error_rate": 0.04984423676012461
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Fishing",
+            "predicted": "Tug",
+            "count": 76,
+            "actual_support": 2846,
+            "actual_error_rate": 0.026704146170063246
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Dredging",
+            "predicted": "Tanker",
+            "count": 71,
+            "actual_support": 471,
+            "actual_error_rate": 0.15074309978768577
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Tanker",
+            "predicted": "Dredging",
+            "count": 64,
+            "actual_support": 15085,
+            "actual_error_rate": 0.004242625124295658
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Military",
+            "predicted": "Passenger",
+            "count": 60,
+            "actual_support": 1605,
+            "actual_error_rate": 0.037383177570093455
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Cargo",
+            "predicted": "Pilot",
+            "count": 57,
+            "actual_support": 39683,
+            "actual_error_rate": 0.0014363833379532798
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Cargo",
+            "predicted": "Towing",
+            "count": 41,
+            "actual_support": 39683,
+            "actual_error_rate": 0.0010331880150190257
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Tug",
+            "predicted": "Pilot",
+            "count": 40,
+            "actual_support": 1182,
+            "actual_error_rate": 0.0338409475465313
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "SAR",
+            "predicted": "Pilot",
+            "count": 30,
+            "actual_support": 58,
+            "actual_error_rate": 0.5172413793103449
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Military",
+            "predicted": "Cargo",
+            "count": 28,
+            "actual_support": 1605,
+            "actual_error_rate": 0.017445482866043614
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Towing",
+            "predicted": "Fishing",
+            "count": 27,
+            "actual_support": 160,
+            "actual_error_rate": 0.16875
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Law enforcement",
+            "predicted": "Pilot",
+            "count": 25,
+            "actual_support": 74,
+            "actual_error_rate": 0.33783783783783783
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Passenger",
+            "predicted": "Military",
+            "count": 21,
+            "actual_support": 3428,
+            "actual_error_rate": 0.006126021003500583
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Cargo",
+            "predicted": "Military",
+            "count": 20,
+            "actual_support": 39683,
+            "actual_error_rate": 0.0005039941536678174
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Dredging",
+            "predicted": "Military",
+            "count": 8,
+            "actual_support": 471,
+            "actual_error_rate": 0.016985138004246284
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Military",
+            "predicted": "Law enforcement",
+            "count": 8,
+            "actual_support": 1605,
+            "actual_error_rate": 0.004984423676012461
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Military",
+            "predicted": "Tug",
+            "count": 8,
+            "actual_support": 1605,
+            "actual_error_rate": 0.004984423676012461
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Military",
+            "predicted": "Towing",
+            "count": 6,
+            "actual_support": 1605,
+            "actual_error_rate": 0.003738317757009346
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Tanker",
+            "predicted": "Fishing",
+            "count": 6,
+            "actual_support": 15085,
+            "actual_error_rate": 0.00039774610540271795
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Tanker",
+            "predicted": "Military",
+            "count": 6,
+            "actual_support": 15085,
+            "actual_error_rate": 0.00039774610540271795
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Pilot",
+            "predicted": "SAR",
+            "count": 5,
+            "actual_support": 583,
+            "actual_error_rate": 0.008576329331046312
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Pilot",
+            "predicted": "Dredging",
+            "count": 3,
+            "actual_support": 583,
+            "actual_error_rate": 0.005145797598627788
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Law enforcement",
+            "predicted": "Dredging",
+            "count": 2,
+            "actual_support": 74,
+            "actual_error_rate": 0.02702702702702703
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Military",
+            "predicted": "Pleasure",
+            "count": 2,
+            "actual_support": 1605,
+            "actual_error_rate": 0.0012461059190031153
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "SAR",
+            "predicted": "Pleasure",
+            "count": 2,
+            "actual_support": 58,
+            "actual_error_rate": 0.034482758620689655
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Tanker",
+            "predicted": "Passenger",
+            "count": 2,
+            "actual_support": 15085,
+            "actual_error_rate": 0.0001325820351342393
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "HSC",
+            "predicted": "Passenger",
+            "count": 1,
+            "actual_support": 1993,
+            "actual_error_rate": 0.0005017561465127947
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Pilot",
+            "predicted": "Pleasure",
+            "count": 1,
+            "actual_support": 583,
+            "actual_error_rate": 0.0017152658662092624
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "SAR",
+            "predicted": "Towing",
+            "count": 1,
+            "actual_support": 58,
+            "actual_error_rate": 0.017241379310344827
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Tug",
+            "predicted": "Fishing",
+            "count": 1,
+            "actual_support": 1182,
+            "actual_error_rate": 0.0008460236886632825
+          }
+        ],
+        "top_confusion_pairs": [
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Tanker",
+            "predicted": "Cargo",
+            "count": 5711,
+            "actual_support": 15085,
+            "actual_error_rate": 0.3785880013258204
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Cargo",
+            "predicted": "Tanker",
+            "count": 2236,
+            "actual_support": 39683,
+            "actual_error_rate": 0.05634654638006199
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Passenger",
+            "predicted": "Cargo",
+            "count": 612,
+            "actual_support": 3428,
+            "actual_error_rate": 0.17852975495915985
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Cargo",
+            "predicted": "Passenger",
+            "count": 237,
+            "actual_support": 39683,
+            "actual_error_rate": 0.0059723307209636365
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Dredging",
+            "predicted": "Cargo",
+            "count": 191,
+            "actual_support": 471,
+            "actual_error_rate": 0.40552016985138006
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Cargo",
+            "predicted": "Dredging",
+            "count": 145,
+            "actual_support": 39683,
+            "actual_error_rate": 0.0036539576140916766
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Towing",
+            "predicted": "Tug",
+            "count": 113,
+            "actual_support": 160,
+            "actual_error_rate": 0.70625
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Fishing",
+            "predicted": "Towing",
+            "count": 110,
+            "actual_support": 2846,
+            "actual_error_rate": 0.03865073787772312
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Military",
+            "predicted": "Dredging",
+            "count": 105,
+            "actual_support": 1605,
+            "actual_error_rate": 0.06542056074766354
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Tug",
+            "predicted": "Towing",
+            "count": 99,
+            "actual_support": 1182,
+            "actual_error_rate": 0.08375634517766498
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Passenger",
+            "predicted": "Tanker",
+            "count": 90,
+            "actual_support": 3428,
+            "actual_error_rate": 0.026254375729288213
+          },
+          {
+            "model_name": "voting",
+            "display_name": "VotingClassifier",
+            "actual": "Military",
+            "predicted": "Sailing",
+            "count": 80,
+            "actual_support": 1605,
+            "actual_error_rate": 0.04984423676012461
+          }
+        ]
+      },
+      {
         "model_name": "xgboost",
         "display_name": "XGBoost",
         "test_accuracy": 0.8022123630300143,
@@ -1393,8 +1881,32 @@
         }
       },
       "note": "The selected model is refit on all rows for deployment after MMSI group-split evaluation. MMSI is not used as a feature."
+    },
+    "probability_calibration": {
+      "method": "one_vs_rest_isotonic",
+      "classes": [
+        "Cargo",
+        "Dredging",
+        "Fishing",
+        "HSC",
+        "Law enforcement",
+        "Military",
+        "Passenger",
+        "Pilot",
+        "Pleasure",
+        "SAR",
+        "Sailing",
+        "Tanker",
+        "Towing",
+        "Tug"
+      ],
+      "calibration_rows": 67168,
+      "calibration_note": "Isotonic calibrators were fit on the MMSI group holdout predictions. The deployed estimator is still refit on all rows; calibration only adjusts reported confidence values.",
+      "ece_before": 0.032421167818008564,
+      "ece_after": 0.010305399902405987
     }
   },
+  "probability_note": "predicted_shiptype_probability is calibrated with one_vs_rest_isotonic.",
   "shiptype_counts": [
     {
       "shiptype": "Cargo",
@@ -1448,87 +1960,87 @@
   "route_type_counts": [
     {
       "predicted_shiptype": "Cargo",
-      "predicted_route": "route_01",
-      "vessel_count": 198
-    },
-    {
-      "predicted_shiptype": "Cargo",
       "predicted_route": "route_06",
-      "vessel_count": 191
+      "vessel_count": 193
     },
     {
       "predicted_shiptype": "Cargo",
       "predicted_route": "route_04",
-      "vessel_count": 184
+      "vessel_count": 188
+    },
+    {
+      "predicted_shiptype": "Cargo",
+      "predicted_route": "route_01",
+      "vessel_count": 183
     },
     {
       "predicted_shiptype": "Cargo",
       "predicted_route": "route_05",
-      "vessel_count": 168
-    },
-    {
-      "predicted_shiptype": "Cargo",
-      "predicted_route": "route_07",
-      "vessel_count": 135
+      "vessel_count": 181
     },
     {
       "predicted_shiptype": "Cargo",
       "predicted_route": "route_00",
-      "vessel_count": 134
+      "vessel_count": 149
     },
     {
       "predicted_shiptype": "Cargo",
-      "predicted_route": "route_11",
-      "vessel_count": 126
+      "predicted_route": "route_07",
+      "vessel_count": 123
     },
     {
       "predicted_shiptype": "Cargo",
       "predicted_route": "route_10",
-      "vessel_count": 116
+      "vessel_count": 119
+    },
+    {
+      "predicted_shiptype": "Cargo",
+      "predicted_route": "route_11",
+      "vessel_count": 114
     },
     {
       "predicted_shiptype": "Cargo",
       "predicted_route": "route_08",
-      "vessel_count": 103
+      "vessel_count": 104
     },
     {
       "predicted_shiptype": "Cargo",
       "predicted_route": "route_02",
-      "vessel_count": 97
+      "vessel_count": 98
     },
     {
       "predicted_shiptype": "Cargo",
       "predicted_route": "route_09",
-      "vessel_count": 95
+      "vessel_count": 96
     },
     {
       "predicted_shiptype": "Cargo",
       "predicted_route": "route_03",
-      "vessel_count": 83
+      "vessel_count": 82
     },
     {
       "predicted_shiptype": "Dredging",
       "predicted_route": "route_04",
-      "vessel_count": 23
+      "vessel_count": 22
     },
     {
       "predicted_shiptype": "Dredging",
       "predicted_route": "route_08",
-      "vessel_count": 17
-    },
-    {
-      "predicted_shiptype": "Dredging",
-      "predicted_route": "route_01",
-      "vessel_count": 16
-    },
-    {
-      "predicted_shiptype": "Dredging",
-      "predicted_route": "route_03",
-      "vessel_count": 15
+      "vessel_count": 18
     },
     {
       "predicted_shiptype": "Dredging",
       "predicted_route": "route_07",
+      "vessel_count": 16
+    },
+    {
+      "predicted_shiptype": "Dredging",
+      "predicted_route": "route_01",
+      "vessel_count": 15
+    },
+    {
+      "predicted_shiptype": "Dredging",
+      "predicted_route": "route_03",
       "vessel_count": 15
     },
     {
@@ -1549,32 +2061,32 @@
     {
       "predicted_shiptype": "Fishing",
       "predicted_route": "route_01",
-      "vessel_count": 223
+      "vessel_count": 222
     },
     {
       "predicted_shiptype": "Fishing",
       "predicted_route": "route_11",
-      "vessel_count": 164
+      "vessel_count": 165
     },
     {
       "predicted_shiptype": "Fishing",
       "predicted_route": "route_10",
-      "vessel_count": 109
+      "vessel_count": 108
     },
     {
       "predicted_shiptype": "Fishing",
       "predicted_route": "route_07",
-      "vessel_count": 95
+      "vessel_count": 97
     },
     {
       "predicted_shiptype": "Fishing",
       "predicted_route": "route_03",
-      "vessel_count": 54
+      "vessel_count": 55
     },
     {
       "predicted_shiptype": "Fishing",
       "predicted_route": "route_04",
-      "vessel_count": 46
+      "vessel_count": 45
     },
     {
       "predicted_shiptype": "Fishing",
@@ -1588,18 +2100,18 @@
     },
     {
       "predicted_shiptype": "Fishing",
-      "predicted_route": "route_06",
-      "vessel_count": 4
+      "predicted_route": "route_05",
+      "vessel_count": 3
     },
     {
       "predicted_shiptype": "Fishing",
-      "predicted_route": "route_05",
+      "predicted_route": "route_06",
       "vessel_count": 3
     },
     {
       "predicted_shiptype": "Law enforcement",
       "predicted_route": "route_04",
-      "vessel_count": 17
+      "vessel_count": 18
     },
     {
       "predicted_shiptype": "Law enforcement",
@@ -1624,7 +2136,7 @@
     {
       "predicted_shiptype": "Law enforcement",
       "predicted_route": "route_07",
-      "vessel_count": 4
+      "vessel_count": 3
     },
     {
       "predicted_shiptype": "Law enforcement",
@@ -1719,7 +2231,7 @@
     {
       "predicted_shiptype": "Pilot",
       "predicted_route": "route_07",
-      "vessel_count": 15
+      "vessel_count": 16
     },
     {
       "predicted_shiptype": "Pilot",
@@ -1729,7 +2241,7 @@
     {
       "predicted_shiptype": "Pilot",
       "predicted_route": "route_11",
-      "vessel_count": 14
+      "vessel_count": 13
     },
     {
       "predicted_shiptype": "Pilot",
@@ -1799,7 +2311,7 @@
     {
       "predicted_shiptype": "SAR",
       "predicted_route": "route_07",
-      "vessel_count": 5
+      "vessel_count": 4
     },
     {
       "predicted_shiptype": "SAR",
@@ -1808,12 +2320,12 @@
     },
     {
       "predicted_shiptype": "SAR",
-      "predicted_route": "route_03",
-      "vessel_count": 2
+      "predicted_route": "route_04",
+      "vessel_count": 3
     },
     {
       "predicted_shiptype": "SAR",
-      "predicted_route": "route_04",
+      "predicted_route": "route_03",
       "vessel_count": 2
     },
     {
@@ -1834,17 +2346,12 @@
     {
       "predicted_shiptype": "Tanker",
       "predicted_route": "route_05",
-      "vessel_count": 83
+      "vessel_count": 90
     },
     {
       "predicted_shiptype": "Tanker",
       "predicted_route": "route_06",
-      "vessel_count": 70
-    },
-    {
-      "predicted_shiptype": "Tanker",
-      "predicted_route": "route_01",
-      "vessel_count": 44
+      "vessel_count": 71
     },
     {
       "predicted_shiptype": "Tanker",
@@ -1853,8 +2360,13 @@
     },
     {
       "predicted_shiptype": "Tanker",
+      "predicted_route": "route_01",
+      "vessel_count": 39
+    },
+    {
+      "predicted_shiptype": "Tanker",
       "predicted_route": "route_04",
-      "vessel_count": 25
+      "vessel_count": 26
     },
     {
       "predicted_shiptype": "Tanker",
@@ -1864,7 +2376,7 @@
     {
       "predicted_shiptype": "Tanker",
       "predicted_route": "route_00",
-      "vessel_count": 18
+      "vessel_count": 19
     },
     {
       "predicted_shiptype": "Tanker",
@@ -1874,12 +2386,12 @@
     {
       "predicted_shiptype": "Tanker",
       "predicted_route": "route_07",
-      "vessel_count": 16
+      "vessel_count": 12
     },
     {
       "predicted_shiptype": "Tanker",
       "predicted_route": "route_09",
-      "vessel_count": 11
+      "vessel_count": 10
     },
     {
       "predicted_shiptype": "Tanker",
@@ -1939,7 +2451,7 @@
     {
       "predicted_shiptype": "Tug",
       "predicted_route": "route_10",
-      "vessel_count": 48
+      "vessel_count": 47
     },
     {
       "predicted_shiptype": "Tug",
@@ -1949,7 +2461,7 @@
     {
       "predicted_shiptype": "Tug",
       "predicted_route": "route_07",
-      "vessel_count": 33
+      "vessel_count": 34
     },
     {
       "predicted_shiptype": "Tug",
@@ -1964,12 +2476,12 @@
     {
       "predicted_shiptype": "Tug",
       "predicted_route": "route_03",
-      "vessel_count": 17
+      "vessel_count": 18
     },
     {
       "predicted_shiptype": "Tug",
       "predicted_route": "route_11",
-      "vessel_count": 14
+      "vessel_count": 13
     }
   ]
 }

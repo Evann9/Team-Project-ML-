@@ -32,6 +32,7 @@ DEFAULT_DATA_PATH = ROOT_DIR / "ais_data_10day.csv"
 DEFAULT_MODEL_PATH = OUTPUT_DIR / "future_position_regressor.joblib"
 DEFAULT_METRICS_PATH = OUTPUT_DIR / "future_position_regressor_metrics.json"
 DEFAULT_PREDICTIONS_PATH = OUTPUT_DIR / "future_position_forecast.csv"
+EARTH_RADIUS_KM = 6371.0088
 RANDOM_STATE = 42
 FEATURE_COLUMNS = [
     "Latitude",
@@ -308,18 +309,33 @@ def fit_and_evaluate(
 
     model = make_model(args)
     model.fit(x_train, y_train)
-    pred = model.predict(x_test)
+    rf_pred = model.predict(x_test)
+    constant_pred = constant_position_predictions(test_df, horizons)
+    dead_pred = dead_reckoning_predictions(test_df, horizons)
 
-    mean_errors = horizon_errors_km(y_test.to_numpy(), pred, horizons)
+    y_true_values = y_test.to_numpy()
+    rf_errors = horizon_errors_km(y_true_values, rf_pred, horizons)
+    baseline_errors = {
+        "constant_position": horizon_errors_km(y_true_values, constant_pred, horizons),
+        "dead_reckoning": horizon_errors_km(y_true_values, dead_pred, horizons),
+    }
+    ensemble_pred, ensemble_errors, ensemble_weights = optimized_rf_dead_reckoning_ensemble(
+        y_true_values,
+        rf_pred,
+        dead_pred,
+        horizons,
+    )
+    baseline_reductions = error_reduction_vs_baselines(ensemble_errors, baseline_errors)
+    rf_reduction = error_reduction_vs_reference(ensemble_errors, rf_errors)
     mae_by_target = {
-        col: float(mean_absolute_error(y_test[col], pred[:, idx]))
+        col: float(mean_absolute_error(y_test[col], ensemble_pred[:, idx]))
         for idx, col in enumerate(target_columns(horizons))
     }
     leakage_overlap = len(set(train_df["MMSI"]).intersection(set(test_df["MMSI"])))
 
     metrics = {
         "model_name": "random_forest_regressor",
-        "display_name": "RandomForestRegressor",
+        "display_name": "RandomForest + Dead-Reckoning Ensemble",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "evaluation_method": "MMSI GroupShuffleSplit holdout",
         "horizons_hours": horizons,
@@ -334,11 +350,242 @@ def fit_and_evaluate(
             "test": int(test_df["MMSI"].nunique()),
             "overlap": int(leakage_overlap),
         },
-        "holdout_mean_error_km": mean_errors,
+        "holdout_mean_error_km": ensemble_errors,
+        "holdout_random_forest_mean_error_km": rf_errors,
+        "holdout_baseline_mean_error_km": baseline_errors,
+        "holdout_error_reduction_vs_baseline_pct": baseline_reductions,
+        "holdout_error_reduction_vs_random_forest_pct": rf_reduction,
         "holdout_mae_degrees": mae_by_target,
+        "ensemble_rf_weight_by_horizon": ensemble_weights,
+        "prediction_policy": (
+            "pred_lat_* and pred_lon_* use the validation-selected blend of "
+            "RandomForest and dead-reckoning for each horizon."
+        ),
         "feature_columns": FEATURE_COLUMNS,
     }
+    metrics["temporal_holdout"] = evaluate_temporal_position_holdout(
+        supervised,
+        horizons,
+        args,
+        ensemble_weights,
+    )
     return model, metrics, fit_train_df
+
+
+def constant_position_predictions(test_df: pd.DataFrame, horizons: list[int]) -> np.ndarray:
+    """선박이 현재 좌표에 그대로 머문다고 가정한 baseline 예측을 만든다."""
+
+    base = test_df[["Latitude", "Longitude"]].to_numpy(dtype=float)
+    return np.tile(base, (1, len(horizons)))
+
+
+def dead_reckoning_predictions(test_df: pd.DataFrame, horizons: list[int]) -> np.ndarray:
+    """현재 SOG/COG가 유지된다고 가정한 등속 직선 baseline 예측을 만든다."""
+
+    pred = np.empty((len(test_df), len(horizons) * 2), dtype=float)
+    for idx, horizon in enumerate(horizons):
+        lat, lon = dead_reckon_latlon(
+            test_df["Latitude"],
+            test_df["Longitude"],
+            test_df["SOG"],
+            test_df["COG"],
+            horizon,
+        )
+        pred[:, idx * 2] = lat
+        pred[:, idx * 2 + 1] = lon
+    return pred
+
+
+def optimized_rf_dead_reckoning_ensemble(
+    y_true: np.ndarray,
+    rf_pred: np.ndarray,
+    dead_pred: np.ndarray,
+    horizons: list[int],
+) -> tuple[np.ndarray, dict[str, float], dict[str, float]]:
+    """각 horizon에서 RF와 dead-reckoning의 검증 최적 가중 평균을 찾는다."""
+
+    ensemble = np.empty_like(rf_pred, dtype=float)
+    errors: dict[str, float] = {}
+    weights: dict[str, float] = {}
+    candidate_weights = np.linspace(0.0, 1.0, 21)
+
+    for idx, horizon in enumerate(horizons):
+        lat_idx = idx * 2
+        lon_idx = lat_idx + 1
+        best_weight = 1.0
+        best_error = math.inf
+        best_pair = rf_pred[:, [lat_idx, lon_idx]]
+
+        for weight in candidate_weights:
+            pair = (weight * rf_pred[:, [lat_idx, lon_idx]]) + (
+                (1.0 - weight) * dead_pred[:, [lat_idx, lon_idx]]
+            )
+            distances = haversine_km(
+                y_true[:, lat_idx],
+                y_true[:, lon_idx],
+                pair[:, 0],
+                pair[:, 1],
+            )
+            error = float(np.nanmean(distances))
+            if error < best_error:
+                best_error = error
+                best_weight = float(weight)
+                best_pair = pair
+
+        ensemble[:, lat_idx] = best_pair[:, 0]
+        ensemble[:, lon_idx] = best_pair[:, 1]
+        errors[f"{horizon}h"] = best_error
+        weights[f"{horizon}h"] = best_weight
+
+    return ensemble, errors, weights
+
+
+def apply_rf_dead_reckoning_ensemble(
+    rf_pred: np.ndarray,
+    dead_pred: np.ndarray,
+    horizons: list[int],
+    weights: dict[str, float],
+) -> np.ndarray:
+    """저장된 horizon별 RF 가중치로 RF/dead-reckoning 예측을 결합한다."""
+
+    ensemble = np.empty_like(rf_pred, dtype=float)
+    for idx, horizon in enumerate(horizons):
+        key = f"{horizon}h"
+        weight = float(weights.get(key, 1.0))
+        lat_idx = idx * 2
+        lon_idx = lat_idx + 1
+        ensemble[:, lat_idx] = (weight * rf_pred[:, lat_idx]) + (
+            (1.0 - weight) * dead_pred[:, lat_idx]
+        )
+        ensemble[:, lon_idx] = (weight * rf_pred[:, lon_idx]) + (
+            (1.0 - weight) * dead_pred[:, lon_idx]
+        )
+    return ensemble
+
+
+def evaluate_temporal_position_holdout(
+    supervised: pd.DataFrame,
+    horizons: list[int],
+    args: argparse.Namespace,
+    ensemble_weights: dict[str, float],
+    train_ratio: float = 0.8,
+) -> dict[str, Any]:
+    """과거 AIS 포인트로 학습하고 이후 시점 포인트에서 위치 예측을 검증한다."""
+
+    ordered = supervised.sort_values("Timestamp", kind="mergesort").reset_index(drop=True)
+    split_at = int(round(len(ordered) * min(max(train_ratio, 0.5), 0.9)))
+    train_df = ordered.iloc[:split_at].copy()
+    test_df = ordered.iloc[split_at:].copy()
+    if train_df.empty or test_df.empty:
+        return {"available": False, "reason": "empty_temporal_split"}
+
+    fit_train_df = sample_rows_by_group(train_df, args.max_train_rows)
+    model = make_model(args)
+    model.fit(fit_train_df[FEATURE_COLUMNS], fit_train_df[target_columns(horizons)])
+
+    y_true = test_df[target_columns(horizons)].to_numpy()
+    rf_pred = model.predict(test_df[FEATURE_COLUMNS])
+    constant_pred = constant_position_predictions(test_df, horizons)
+    dead_pred = dead_reckoning_predictions(test_df, horizons)
+    ensemble_pred = apply_rf_dead_reckoning_ensemble(
+        rf_pred,
+        dead_pred,
+        horizons,
+        ensemble_weights,
+    )
+
+    train_groups = set(train_df["MMSI"].astype(str))
+    test_groups = set(test_df["MMSI"].astype(str))
+    return {
+        "available": True,
+        "method": "timestamp_ordered_80_20_holdout",
+        "train_rows": int(len(train_df)),
+        "train_used_for_fit": int(len(fit_train_df)),
+        "test_rows": int(len(test_df)),
+        "train_start": train_df["Timestamp"].min().isoformat(),
+        "train_end": train_df["Timestamp"].max().isoformat(),
+        "test_start": test_df["Timestamp"].min().isoformat(),
+        "test_end": test_df["Timestamp"].max().isoformat(),
+        "groups": {
+            "train": int(len(train_groups)),
+            "test": int(len(test_groups)),
+            "overlap": int(len(train_groups.intersection(test_groups))),
+        },
+        "ensemble_mean_error_km": horizon_errors_km(y_true, ensemble_pred, horizons),
+        "random_forest_mean_error_km": horizon_errors_km(y_true, rf_pred, horizons),
+        "baseline_mean_error_km": {
+            "constant_position": horizon_errors_km(y_true, constant_pred, horizons),
+            "dead_reckoning": horizon_errors_km(y_true, dead_pred, horizons),
+        },
+        "ensemble_rf_weight_by_horizon": ensemble_weights,
+    }
+
+
+def dead_reckon_latlon(
+    lat: Any,
+    lon: Any,
+    sog: Any,
+    cog: Any,
+    horizon_hours: int,
+) -> tuple[np.ndarray, np.ndarray]:
+    """현재 위치, 속도(knots), 침로(degree)로 destination point를 계산한다."""
+
+    lat_rad = np.radians(np.asarray(lat, dtype=float))
+    lon_rad = np.radians(np.asarray(lon, dtype=float))
+    speed_knots = np.nan_to_num(np.asarray(sog, dtype=float), nan=0.0, posinf=0.0, neginf=0.0)
+    speed_knots = np.clip(speed_knots, 0.0, 70.0)
+    bearing = np.radians(
+        np.mod(np.nan_to_num(np.asarray(cog, dtype=float), nan=0.0), 360.0)
+    )
+    angular_distance = (speed_knots * 1.852 * float(horizon_hours)) / EARTH_RADIUS_KM
+
+    dest_lat = np.arcsin(
+        np.sin(lat_rad) * np.cos(angular_distance)
+        + np.cos(lat_rad) * np.sin(angular_distance) * np.cos(bearing)
+    )
+    dest_lon = lon_rad + np.arctan2(
+        np.sin(bearing) * np.sin(angular_distance) * np.cos(lat_rad),
+        np.cos(angular_distance) - np.sin(lat_rad) * np.sin(dest_lat),
+    )
+
+    dest_lon_deg = ((np.degrees(dest_lon) + 180.0) % 360.0) - 180.0
+    return np.degrees(dest_lat), dest_lon_deg
+
+
+def error_reduction_vs_baselines(
+    model_errors: dict[str, float],
+    baseline_errors: dict[str, dict[str, float]],
+) -> dict[str, dict[str, float | None]]:
+    """baseline 대비 모델 평균 거리 오류 감소율을 계산한다."""
+
+    reductions: dict[str, dict[str, float | None]] = {}
+    for baseline_name, errors in baseline_errors.items():
+        reductions[baseline_name] = {}
+        for horizon, baseline_error in errors.items():
+            model_error = model_errors.get(horizon)
+            if model_error is None or baseline_error <= 0:
+                reductions[baseline_name][horizon] = None
+                continue
+            reductions[baseline_name][horizon] = float(
+                (baseline_error - model_error) / baseline_error * 100.0
+            )
+    return reductions
+
+
+def error_reduction_vs_reference(
+    model_errors: dict[str, float],
+    reference_errors: dict[str, float],
+) -> dict[str, float | None]:
+    """단일 reference 대비 horizon별 오류 감소율을 계산한다."""
+
+    reductions: dict[str, float | None] = {}
+    for horizon, reference_error in reference_errors.items():
+        model_error = model_errors.get(horizon)
+        if model_error is None or reference_error <= 0:
+            reductions[horizon] = None
+            continue
+        reductions[horizon] = float((reference_error - model_error) / reference_error * 100.0)
+    return reductions
 
 
 def horizon_errors_km(y_true: np.ndarray, y_pred: np.ndarray, horizons: list[int]) -> dict[str, float]:
@@ -371,7 +618,7 @@ def haversine_km(lat1: Any, lon1: Any, lat2: Any, lon2: Any) -> np.ndarray:
         np.sin(dlat / 2.0) ** 2
         + np.cos(lat1_arr) * np.cos(lat2_arr) * np.sin(dlon / 2.0) ** 2
     )
-    return 6371.0088 * 2.0 * np.arcsin(np.minimum(1.0, np.sqrt(value)))
+    return EARTH_RADIUS_KM * 2.0 * np.arcsin(np.minimum(1.0, np.sqrt(value)))
 
 
 def refit_for_deploy(
@@ -407,7 +654,9 @@ def latest_position_predictions(
         .tail(1)
         .copy()
     )
-    pred = model.predict(latest[FEATURE_COLUMNS])
+    rf_pred = model.predict(latest[FEATURE_COLUMNS])
+    dead_pred = dead_reckoning_predictions(latest, horizons)
+    weights = metrics.get("ensemble_rf_weight_by_horizon", {})
 
     output = latest[["MMSI", "Timestamp", "Latitude", "Longitude"]].rename(
         columns={
@@ -417,8 +666,22 @@ def latest_position_predictions(
         }
     )
     for idx, horizon in enumerate(horizons):
-        output[f"pred_lat_{horizon}h"] = np.clip(pred[:, idx * 2], -90, 90)
-        output[f"pred_lon_{horizon}h"] = np.clip(pred[:, idx * 2 + 1], -180, 180)
+        key = f"{horizon}h"
+        weight = float(weights.get(key, 1.0))
+        lat_idx = idx * 2
+        lon_idx = lat_idx + 1
+        pred_lat = (weight * rf_pred[:, lat_idx]) + ((1.0 - weight) * dead_pred[:, lat_idx])
+        pred_lon = (weight * rf_pred[:, lon_idx]) + ((1.0 - weight) * dead_pred[:, lon_idx])
+        output[f"pred_lat_{horizon}h"] = np.clip(pred_lat, -90, 90)
+        output[f"pred_lon_{horizon}h"] = np.clip(pred_lon, -180, 180)
+        output[f"rf_pred_lat_{horizon}h"] = np.clip(rf_pred[:, lat_idx], -90, 90)
+        output[f"rf_pred_lon_{horizon}h"] = np.clip(rf_pred[:, lon_idx], -180, 180)
+        output[f"dead_reckoning_pred_lat_{horizon}h"] = np.clip(dead_pred[:, lat_idx], -90, 90)
+        output[f"dead_reckoning_pred_lon_{horizon}h"] = np.clip(dead_pred[:, lon_idx], -180, 180)
+        output[f"rf_weight_{horizon}h"] = weight
+        output[f"prediction_method_{horizon}h"] = (
+            "dead_reckoning" if weight <= 0.0 else "random_forest" if weight >= 1.0 else "rf_dead_reckoning_blend"
+        )
 
     errors = metrics.get("holdout_mean_error_km", {})
     numeric_errors = [float(value) for value in errors.values() if value is not None]
@@ -481,7 +744,15 @@ def main() -> None:
     print(f"Saved future position metrics: {args.metrics_out.resolve()}")
     print(f"Saved future position predictions: {args.predictions_out.resolve()}")
     for horizon, error in metrics["holdout_mean_error_km"].items():
+        weight = metrics["ensemble_rf_weight_by_horizon"].get(horizon)
+        print(f"- {horizon}: ensemble mean error {error:.3f} km (rf_weight={weight:.2f})")
+    print("RandomForest only:")
+    for horizon, error in metrics["holdout_random_forest_mean_error_km"].items():
         print(f"- {horizon}: mean error {error:.3f} km")
+    print("Baselines:")
+    for baseline_name, errors in metrics["holdout_baseline_mean_error_km"].items():
+        summary = ", ".join(f"{horizon}={error:.3f} km" for horizon, error in errors.items())
+        print(f"- {baseline_name}: {summary}")
     print(f"Group leakage check: overlap={metrics['groups']['overlap']} MMSI")
 
 

@@ -111,7 +111,26 @@ def parse_args() -> argparse.Namespace:
         "--early-fraction",
         type=float,
         default=0.35,
-        help="Early part of each track used by the classifier as route evidence.",
+        help=(
+            "Fallback fraction of each track used by the classifier when "
+            "--early-window-hours is 0."
+        ),
+    )
+    parser.add_argument(
+        "--early-window-hours",
+        type=float,
+        default=6.0,
+        help=(
+            "Fixed initial observation window used by the route classifier. "
+            "Use 0 to fall back to --early-fraction."
+        ),
+    )
+    parser.add_argument(
+        "--early-eval-windows",
+        nargs="+",
+        type=float,
+        default=[1.0, 3.0, 6.0, 12.0],
+        help="Observation windows, in hours, to compare for route classifier diagnostics.",
     )
     parser.add_argument(
         "--target-col",
@@ -364,19 +383,32 @@ def sample_track_signature(group: pd.DataFrame, points: int) -> np.ndarray:
     return np.column_stack([sampled_lat, sampled_lon]).reshape(-1)
 
 
-def early_track(group: pd.DataFrame, early_fraction: float) -> pd.DataFrame:
+def early_track(
+    group: pd.DataFrame,
+    early_fraction: float,
+    early_window_hours: float = 0.0,
+) -> pd.DataFrame:
     """항로 예측에 사용할 track의 초기 구간을 반환한다.
 
     분류기는 전체 궤적을 알기 전에 선박의 가능성 높은 항로를 예측할 수
-    있도록 초기 증거로 학습된다. 매우 짧거나 지속 시간이 0인 track은 가능한
-    한 최소 두 포인트를 보존하도록 처음 몇 행을 fallback으로 사용한다.
+    있도록 초기 증거로 학습된다. 기본값은 실제 운영 시점에 맞추기 쉬운
+    고정 시간창이며, 필요할 때만 전체 track 길이 기준 fraction을 fallback으로
+    사용할 수 있다. 매우 짧거나 지속 시간이 0인 track은 가능한 한 최소 두
+    포인트를 보존하도록 처음 몇 행을 fallback으로 사용한다.
     """
 
     if len(group) <= 2:
         return group
 
-    early_fraction = min(max(early_fraction, 0.05), 1.0)
     start = group["Timestamp"].iloc[0]
+    if early_window_hours and early_window_hours > 0:
+        cutoff = start + pd.to_timedelta(float(early_window_hours), unit="h")
+        early = group.loc[group["Timestamp"] <= cutoff]
+        if len(early) < 2:
+            early = group.iloc[:2]
+        return early
+
+    early_fraction = min(max(early_fraction, 0.05), 1.0)
     end = group["Timestamp"].iloc[-1]
     duration = (end - start).total_seconds()
     if duration <= 0:
@@ -404,6 +436,7 @@ def build_features(
     df: pd.DataFrame,
     route_points: int,
     early_fraction: float,
+    early_window_hours: float = 0.0,
 ) -> FeatureBuildResult:
     """포인트 단위 AIS track을 선박 단위 모델 입력으로 집계한다.
 
@@ -442,6 +475,42 @@ def build_features(
         cog_rad = np.radians(cog)
         route_target_cols = [col for col in ROUTE_LABEL_CANDIDATES if col in group.columns]
 
+        early = early_track(group, early_fraction, early_window_hours)
+        early_lat = early["Latitude"].to_numpy(dtype=float)
+        early_lon = early["Longitude"].to_numpy(dtype=float)
+        early_sog = early["SOG"].to_numpy(dtype=float)
+        early_cog = early["COG"].to_numpy(dtype=float)
+        early_timestamps = early["Timestamp"]
+
+        early_segment_distance = 0.0
+        if len(early) > 1:
+            early_segment_distance = float(
+                np.nansum(
+                    haversine_km(
+                        early_lat[:-1],
+                        early_lon[:-1],
+                        early_lat[1:],
+                        early_lon[1:],
+                    )
+                )
+            )
+
+        early_displacement = float(
+            haversine_km(early_lat[0], early_lon[0], early_lat[-1], early_lon[-1])
+        )
+        early_bearing = bearing_degrees(
+            early_lat[0],
+            early_lon[0],
+            early_lat[-1],
+            early_lon[-1],
+        )
+        early_duration_hours = max(
+            (early_timestamps.iloc[-1] - early_timestamps.iloc[0]).total_seconds()
+            / 3600.0,
+            0.0,
+        )
+        early_cog_rad = np.radians(early_cog)
+
         row: dict[str, Any] = {
             "MMSI": mmsi,
             "first_timestamp": timestamps.iloc[0],
@@ -477,6 +546,35 @@ def build_features(
             else 0.0,
             "bearing_sin": float(math.sin(math.radians(bearing))),
             "bearing_cos": float(math.cos(math.radians(bearing))),
+            "early_point_count": int(len(early)),
+            "early_duration_hours": early_duration_hours,
+            "early_start_lat": float(early_lat[0]),
+            "early_start_lon": float(early_lon[0]),
+            "early_observed_lat": float(early_lat[-1]),
+            "early_observed_lon": float(early_lon[-1]),
+            "early_mean_lat": float(np.nanmean(early_lat)),
+            "early_mean_lon": float(np.nanmean(early_lon)),
+            "early_std_lat": float(np.nanstd(early_lat)),
+            "early_std_lon": float(np.nanstd(early_lon)),
+            "early_min_lat": float(np.nanmin(early_lat)),
+            "early_max_lat": float(np.nanmax(early_lat)),
+            "early_min_lon": float(np.nanmin(early_lon)),
+            "early_max_lon": float(np.nanmax(early_lon)),
+            "early_mean_sog": float(np.nanmean(early_sog)),
+            "early_std_sog": float(np.nanstd(early_sog)),
+            "early_max_sog": float(np.nanmax(early_sog)),
+            "early_slow_point_ratio": float(np.nanmean(early_sog <= 1.0)),
+            "early_mean_cog_sin": float(np.nanmean(np.sin(early_cog_rad))),
+            "early_mean_cog_cos": float(np.nanmean(np.cos(early_cog_rad))),
+            "early_total_distance_km": early_segment_distance,
+            "early_displacement_km": early_displacement,
+            "early_straightness_ratio": float(
+                early_displacement / early_segment_distance
+            )
+            if early_segment_distance > 0
+            else 0.0,
+            "early_bearing_sin": float(math.sin(math.radians(early_bearing))),
+            "early_bearing_cos": float(math.cos(math.radians(early_bearing))),
         }
 
         for target_col in route_target_cols:
@@ -486,9 +584,7 @@ def build_features(
 
         vessel_rows.append(row)
         signatures.append(sample_track_signature(group, route_points))
-        early_signatures.append(
-            sample_track_signature(early_track(group, early_fraction), route_points)
-        )
+        early_signatures.append(sample_track_signature(early, route_points))
 
     vessels = pd.DataFrame(vessel_rows)
     signature = pd.DataFrame(signatures, columns=full_sig_cols)
@@ -524,43 +620,44 @@ def make_feature_matrix(
     vessels: pd.DataFrame,
     early_signature: pd.DataFrame,
 ) -> tuple[pd.DataFrame, list[str]]:
-    """집계 특징과 초기 형태 특징으로 분류기 특징 행렬을 조립한다.
+    """초기 관측 특징과 초기 형태 특징으로 분류기 특징 행렬을 조립한다.
 
-    정적 선박 요약과 항로 진행 특징을 초기 궤적 signature와 이어 붙인다.
-    DataFrame과 함께 컬럼 목록을 반환해, 저장 번들이 학습 때의 특징 순서를
-    보존할 수 있게 한다.
+    항로 분류기는 전체 궤적이 끝난 뒤에야 알 수 있는 end_lat/end_lon,
+    전체 duration, 전체 이동거리, 전체 위경도 범위 등을 입력으로 쓰지
+    않는다. 정적 선박 치수와 초기 관측 구간 요약만 초기 궤적 signature와
+    이어 붙여, 실시간/부분 track 예측 주장에 맞는 feature scope를 유지한다.
     """
 
     base_cols = [
-        "point_count",
-        "duration_hours",
-        "start_lat",
-        "start_lon",
-        "end_lat",
-        "end_lon",
-        "mean_lat",
-        "mean_lon",
-        "std_lat",
-        "std_lon",
-        "min_lat",
-        "max_lat",
-        "min_lon",
-        "max_lon",
-        "mean_sog",
-        "std_sog",
-        "max_sog",
-        "slow_point_ratio",
-        "mean_cog_sin",
-        "mean_cog_cos",
+        "early_point_count",
+        "early_duration_hours",
+        "early_start_lat",
+        "early_start_lon",
+        "early_observed_lat",
+        "early_observed_lon",
+        "early_mean_lat",
+        "early_mean_lon",
+        "early_std_lat",
+        "early_std_lon",
+        "early_min_lat",
+        "early_max_lat",
+        "early_min_lon",
+        "early_max_lon",
+        "early_mean_sog",
+        "early_std_sog",
+        "early_max_sog",
+        "early_slow_point_ratio",
+        "early_mean_cog_sin",
+        "early_mean_cog_cos",
         "width",
         "length",
         "draught",
         "shiptype",
-        "total_distance_km",
-        "displacement_km",
-        "straightness_ratio",
-        "bearing_sin",
-        "bearing_cos",
+        "early_total_distance_km",
+        "early_displacement_km",
+        "early_straightness_ratio",
+        "early_bearing_sin",
+        "early_bearing_cos",
     ]
     feature_df = pd.concat(
         [
@@ -641,25 +738,27 @@ def train_classifier(
     분류기는 배포를 위해 전체 행에 학습된다.
     """
 
-    classifier = Pipeline(
-        steps=[
-            ("imputer", SimpleImputer(strategy="median")),
-            (
-                "model",
-                RandomForestClassifier(
-                    n_estimators=500,
-                    min_samples_leaf=2,
-                    class_weight="balanced_subsample",
-                    n_jobs=-1,
-                    random_state=random_state,
-                ),
-            ),
-        ]
-    )
+    classifier = make_route_classifier(random_state)
 
     metrics: dict[str, Any] = {
         "train_vessels": int(len(y)),
         "route_classes": int(y.nunique()),
+        "classifier_feature_scope": "early_track_only",
+        "excluded_full_track_features": [
+            "point_count",
+            "end_lat",
+            "end_lon",
+            "duration_hours",
+            "mean_lat",
+            "mean_lon",
+            "min_lat",
+            "max_lat",
+            "min_lon",
+            "max_lon",
+            "total_distance_km",
+            "displacement_km",
+            "straightness_ratio",
+        ],
     }
 
     counts = y.value_counts()
@@ -686,6 +785,232 @@ def train_classifier(
 
     classifier.fit(x, y)
     return classifier, metrics
+
+
+def make_route_classifier(random_state: int) -> Pipeline:
+    """항로 분류용 RandomForest 파이프라인을 생성한다."""
+
+    return Pipeline(
+        steps=[
+            ("imputer", SimpleImputer(strategy="median")),
+            (
+                "model",
+                RandomForestClassifier(
+                    n_estimators=500,
+                    min_samples_leaf=2,
+                    class_weight="balanced_subsample",
+                    n_jobs=-1,
+                    random_state=random_state,
+                ),
+            ),
+        ]
+    )
+
+
+def assign_kmeans_route_labels(
+    signature: pd.DataFrame,
+    route_info: dict[str, Any],
+) -> pd.Series:
+    """학습된 KMeans route catalog 기준으로 signature를 route label에 배정한다."""
+
+    scaler = route_info["signature_scaler"]
+    cluster_model = route_info.get("cluster_model")
+    if cluster_model is None:
+        raise ValueError("KMeans route model is required for route assignment.")
+    scaled = scaler.transform(signature)
+    cluster_ids = cluster_model.predict(scaled)
+    return pd.Series([f"route_{idx:02d}" for idx in cluster_ids], index=signature.index)
+
+
+def evaluate_route_holdout(
+    x_train: pd.DataFrame,
+    x_test: pd.DataFrame,
+    y_train: pd.Series,
+    y_test: pd.Series,
+    random_state: int,
+) -> dict[str, Any]:
+    """주어진 train/test 특징과 라벨로 항로 분류기를 평가한다."""
+
+    classifier = make_route_classifier(random_state)
+    classifier.fit(x_train, y_train)
+    pred = classifier.predict(x_test)
+    return {
+        "train_rows": int(len(x_train)),
+        "test_rows": int(len(x_test)),
+        "route_classes_train": int(pd.Series(y_train).nunique()),
+        "route_classes_test": int(pd.Series(y_test).nunique()),
+        "accuracy": float(accuracy_score(y_test, pred)),
+        "macro_f1": float(f1_score(y_test, pred, average="macro", zero_division=0)),
+        "classification_report": classification_report(
+            y_test,
+            pred,
+            zero_division=0,
+            output_dict=True,
+        ),
+    }
+
+
+def evaluate_strict_route_holdout(
+    vessels: pd.DataFrame,
+    signature: pd.DataFrame,
+    x: pd.DataFrame,
+    target_col: str | None,
+    requested_clusters: int,
+    random_state: int,
+    test_size: float = 0.2,
+) -> dict[str, Any]:
+    """KMeans route catalog까지 train fold 안에서만 fit하는 엄격 평가를 수행한다."""
+
+    if len(vessels) < 10:
+        return {"available": False, "reason": "not_enough_vessels"}
+
+    indices = np.arange(len(vessels))
+    if target_col:
+        y_all = vessels[target_col].astype(str).fillna("unknown_route")
+        counts = y_all.value_counts()
+        stratify = y_all if y_all.nunique() > 1 and int(counts.min()) >= 2 else None
+    else:
+        y_all = None
+        stratify = None
+
+    train_idx, test_idx = train_test_split(
+        indices,
+        test_size=min(max(test_size, 0.05), 0.5),
+        random_state=random_state,
+        stratify=stratify,
+    )
+
+    if target_col:
+        y_train = y_all.iloc[train_idx].reset_index(drop=True)
+        y_test = y_all.iloc[test_idx].reset_index(drop=True)
+        label_source = "existing_column"
+    else:
+        y_train, fold_route_info = train_route_labels(
+            vessels.iloc[train_idx].reset_index(drop=True),
+            signature.iloc[train_idx].reset_index(drop=True),
+            target_col=None,
+            requested_clusters=requested_clusters,
+            random_state=random_state,
+        )
+        y_test = assign_kmeans_route_labels(
+            signature.iloc[test_idx].reset_index(drop=True),
+            fold_route_info,
+        ).reset_index(drop=True)
+        label_source = "train_fold_kmeans_signature"
+
+    metrics = evaluate_route_holdout(
+        x.iloc[train_idx].reset_index(drop=True),
+        x.iloc[test_idx].reset_index(drop=True),
+        y_train,
+        y_test,
+        random_state,
+    )
+    metrics.update(
+        {
+            "available": True,
+            "method": "random_vessel_holdout_train_fold_route_catalog",
+            "label_source": label_source,
+        }
+    )
+    return metrics
+
+
+def evaluate_temporal_route_holdout(
+    vessels: pd.DataFrame,
+    signature: pd.DataFrame,
+    x: pd.DataFrame,
+    target_col: str | None,
+    requested_clusters: int,
+    random_state: int,
+    train_ratio: float = 0.8,
+) -> dict[str, Any]:
+    """과거 출항 vessel을 train, 이후 vessel을 test로 두는 시간 기준 평가."""
+
+    if "first_timestamp" not in vessels.columns or len(vessels) < 10:
+        return {"available": False, "reason": "missing_timestamp_or_not_enough_vessels"}
+
+    ordered = vessels.sort_values("first_timestamp", kind="mergesort").index.to_numpy()
+    split_at = int(round(len(ordered) * min(max(train_ratio, 0.5), 0.9)))
+    train_idx = ordered[:split_at]
+    test_idx = ordered[split_at:]
+    if len(train_idx) == 0 or len(test_idx) == 0:
+        return {"available": False, "reason": "empty_temporal_split"}
+
+    if target_col:
+        y_all = vessels[target_col].astype(str).fillna("unknown_route")
+        y_train = y_all.loc[train_idx].reset_index(drop=True)
+        y_test = y_all.loc[test_idx].reset_index(drop=True)
+        label_source = "existing_column"
+    else:
+        y_train, fold_route_info = train_route_labels(
+            vessels.loc[train_idx].reset_index(drop=True),
+            signature.loc[train_idx].reset_index(drop=True),
+            target_col=None,
+            requested_clusters=requested_clusters,
+            random_state=random_state,
+        )
+        y_test = assign_kmeans_route_labels(
+            signature.loc[test_idx].reset_index(drop=True),
+            fold_route_info,
+        ).reset_index(drop=True)
+        label_source = "past_train_kmeans_signature"
+
+    metrics = evaluate_route_holdout(
+        x.loc[train_idx].reset_index(drop=True),
+        x.loc[test_idx].reset_index(drop=True),
+        y_train,
+        y_test,
+        random_state,
+    )
+    train_times = vessels.loc[train_idx, "first_timestamp"]
+    test_times = vessels.loc[test_idx, "first_timestamp"]
+    metrics.update(
+        {
+            "available": True,
+            "method": "temporal_vessel_holdout_train_fold_route_catalog",
+            "label_source": label_source,
+            "train_start": train_times.min().isoformat(),
+            "train_end": train_times.max().isoformat(),
+            "test_start": test_times.min().isoformat(),
+            "test_end": test_times.max().isoformat(),
+        }
+    )
+    return metrics
+
+
+def evaluate_early_windows(
+    clean_points: pd.DataFrame,
+    route_labels_by_mmsi: pd.Series,
+    route_points: int,
+    early_fraction: float,
+    windows: list[float],
+    random_state: int,
+) -> pd.DataFrame:
+    """초기 관측 시간창별 항로 분류 성능을 표 형태로 계산한다."""
+
+    rows: list[dict[str, Any]] = []
+    for window in sorted({float(value) for value in windows if float(value) > 0}):
+        built = build_features(
+            clean_points,
+            route_points=route_points,
+            early_fraction=early_fraction,
+            early_window_hours=window,
+        )
+        labels = built.vessels["MMSI"].map(route_labels_by_mmsi).astype(str)
+        x_window, feature_cols = make_feature_matrix(built.vessels, built.early_signature)
+        _, metrics = train_classifier(x_window, labels, random_state)
+        rows.append(
+            {
+                "early_window_hours": window,
+                "vessels": int(len(labels)),
+                "feature_count": int(len(feature_cols)),
+                "route_classes": int(labels.nunique()),
+                "holdout_accuracy": metrics.get("holdout_accuracy"),
+                "holdout_f1_macro": metrics.get("holdout_f1_macro"),
+                "evaluation_label_source": "full_route_catalog_for_window_sensitivity",
+            }
+        )
+    return pd.DataFrame(rows)
 
 
 def route_distances(
@@ -879,9 +1204,10 @@ def predict_routes(
 ) -> pd.DataFrame:
     """선박별 항로, 이상 점수, 정박 목적지를 예측한다.
 
-    항로 확률은 분류기에서 나오며, 이상 점수는 예측 항로 centroid와의 거리와
-    분류기 불확실성을 결합한다. 정박지 예측은 이후 병합되어 최종 CSV가 선박당
-    한 행으로 항로, 이상 여부, 목적지 맥락을 모두 담게 한다.
+    항로 분류는 초기 관측 구간 특징만 사용한다. 이상 점수는 항적을 충분히
+    관측한 뒤 쓰는 전체 궤적 signature와 예측 항로 centroid 사이의 거리,
+    그리고 분류기 불확실성을 결합한다. 정박지 예측은 이후 병합되어 최종
+    CSV가 선박당 한 행으로 항로, 이상 여부, 목적지 맥락을 모두 담게 한다.
     """
 
     x, _ = make_feature_matrix(built.vessels, built.early_signature)
@@ -1046,7 +1372,12 @@ def train_and_run(args: argparse.Namespace) -> None:
         f"vessels: {train_points['MMSI'].nunique():,}"
     )
 
-    train_built = build_features(train_points, args.route_points, args.early_fraction)
+    train_built = build_features(
+        train_points,
+        args.route_points,
+        args.early_fraction,
+        args.early_window_hours,
+    )
     target_col = resolve_target_column(train_built.vessels, args.target_col)
     route_labels, route_info = train_route_labels(
         train_built.vessels,
@@ -1061,6 +1392,34 @@ def train_and_run(args: argparse.Namespace) -> None:
         train_built.early_signature,
     )
     classifier, metrics = train_classifier(x_train, route_labels, args.random_state)
+    strict_route_evaluation = evaluate_strict_route_holdout(
+        train_built.vessels,
+        train_built.signature,
+        x_train,
+        target_col,
+        args.route_clusters,
+        args.random_state,
+    )
+    temporal_route_evaluation = evaluate_temporal_route_holdout(
+        train_built.vessels,
+        train_built.signature,
+        x_train,
+        target_col,
+        args.route_clusters,
+        args.random_state,
+    )
+    route_labels_by_mmsi = pd.Series(
+        route_labels.astype(str).to_numpy(),
+        index=train_built.vessels["MMSI"],
+    )
+    early_window_metrics = evaluate_early_windows(
+        train_built.clean_points,
+        route_labels_by_mmsi,
+        args.route_points,
+        args.early_fraction,
+        args.early_eval_windows,
+        args.random_state,
+    )
     anomaly_thresholds = train_anomaly_thresholds(
         train_built.signature,
         route_labels,
@@ -1079,6 +1438,7 @@ def train_and_run(args: argparse.Namespace) -> None:
         "feature_cols": feature_cols,
         "route_points": args.route_points,
         "early_fraction": args.early_fraction,
+        "early_window_hours": args.early_window_hours,
         "route_info": route_info,
         "anomaly_thresholds": anomaly_thresholds,
         "anchorage_clusters": anchorage_clusters,
@@ -1086,6 +1446,14 @@ def train_and_run(args: argparse.Namespace) -> None:
             "train_data": str(train_path),
             "label_source": route_info["label_source"],
             "target_col": target_col,
+            "classifier_feature_scope": "early_track_only",
+            "early_window_hours": args.early_window_hours,
+            "early_fraction_fallback": args.early_fraction,
+            "full_track_features_used_for": [
+                "route_labeling",
+                "anomaly_distance",
+                "reporting_outputs",
+            ],
             "slow_sog": args.slow_sog,
             "anchorage_eps_km": args.anchorage_eps_km,
             "anchorage_min_samples": args.anchorage_min_samples,
@@ -1102,7 +1470,12 @@ def train_and_run(args: argparse.Namespace) -> None:
 
     print(f"Loading prediction data: {predict_path}")
     predict_points = load_and_clean_ais(predict_path)
-    predict_built = build_features(predict_points, args.route_points, args.early_fraction)
+    predict_built = build_features(
+        predict_points,
+        args.route_points,
+        args.early_fraction,
+        args.early_window_hours,
+    )
     predictions = predict_routes(
         predict_built,
         bundle,
@@ -1130,6 +1503,11 @@ def train_and_run(args: argparse.Namespace) -> None:
     )
     route_catalog.to_csv(output_dir / "route_catalog.csv", index=False, encoding="utf-8-sig")
     route_centers.to_csv(output_dir / "route_centers_long.csv", index=False, encoding="utf-8-sig")
+    early_window_metrics.to_csv(
+        output_dir / "route_early_window_metrics.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
     predictions.to_csv(output_dir / "route_predictions.csv", index=False, encoding="utf-8-sig")
     anomaly_ships.to_csv(output_dir / "anomaly_ships.csv", index=False, encoding="utf-8-sig")
     anchorage_predictions.to_csv(
@@ -1153,7 +1531,18 @@ def train_and_run(args: argparse.Namespace) -> None:
         "predicted_vessels": int(len(predictions)),
         "route_classes": int(route_labels.nunique()),
         "label_source": route_info["label_source"],
+        "classifier_feature_scope": "early_track_only",
+        "early_window_hours": args.early_window_hours,
+        "early_fraction_fallback": args.early_fraction,
+        "full_track_features_used_for": [
+            "route_labeling",
+            "anomaly_distance",
+            "reporting_outputs",
+        ],
         "metrics": metrics,
+        "strict_route_evaluation": strict_route_evaluation,
+        "temporal_route_evaluation": temporal_route_evaluation,
+        "early_window_metrics": early_window_metrics.to_dict("records"),
         "anomaly_thresholds": anomaly_thresholds,
         "anomaly_count": int(predictions["is_anomaly"].sum()),
         "anchorage_cluster_count": int(len(anchorage_clusters)),
@@ -1164,6 +1553,7 @@ def train_and_run(args: argparse.Namespace) -> None:
             "anchorage_clusters": str(output_dir / "anchorage_clusters.csv"),
             "route_catalog": str(output_dir / "route_catalog.csv"),
             "route_centers_long": str(output_dir / "route_centers_long.csv"),
+            "route_early_window_metrics": str(output_dir / "route_early_window_metrics.csv"),
         },
     }
     save_json(output_dir / "run_summary.json", summary)
@@ -1173,6 +1563,18 @@ def train_and_run(args: argparse.Namespace) -> None:
     if "holdout_accuracy" in metrics:
         print(f"Holdout accuracy: {metrics['holdout_accuracy']:.4f}")
         print(f"Holdout macro F1: {metrics['holdout_f1_macro']:.4f}")
+    if strict_route_evaluation.get("available"):
+        print(
+            "Strict route holdout: "
+            f"accuracy={strict_route_evaluation['accuracy']:.4f}, "
+            f"macro_f1={strict_route_evaluation['macro_f1']:.4f}"
+        )
+    if temporal_route_evaluation.get("available"):
+        print(
+            "Temporal route holdout: "
+            f"accuracy={temporal_route_evaluation['accuracy']:.4f}, "
+            f"macro_f1={temporal_route_evaluation['macro_f1']:.4f}"
+        )
     print(f"Predicted vessels: {len(predictions):,}")
     print(f"Anomaly vessels: {int(predictions['is_anomaly'].sum()):,}")
     print(f"Anchorage clusters: {len(anchorage_clusters):,}")

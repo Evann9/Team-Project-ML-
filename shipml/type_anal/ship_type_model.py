@@ -596,6 +596,13 @@ def metrics_summary(bundle: dict[str, Any]) -> dict[str, Any]:
     }
     if "evaluation" in bundle:
         summary["evaluation"] = bundle["evaluation"]
+    if "probability_calibration" in bundle:
+        calibration = bundle["probability_calibration"]
+        summary["probability_calibration"] = {
+            key: value
+            for key, value in calibration.items()
+            if key != "calibrators"
+        }
     return summary
 
 
@@ -652,9 +659,79 @@ def predict_ship_types(
     probabilities = np.full(len(x), np.nan)
     if hasattr(estimator, "predict_proba"):
         proba = estimator.predict_proba(x)
-        probabilities = np.asarray(proba).max(axis=1)
+        proba_classes = probability_class_order(bundle, estimator)
+        proba, proba_classes = apply_probability_calibration(
+            bundle,
+            np.asarray(proba),
+            proba_classes,
+        )
+        probabilities = predicted_class_confidence(pred, proba, proba_classes)
 
     return np.asarray(pred, dtype=object), probabilities
+
+
+def probability_class_order(bundle: dict[str, Any], estimator: Pipeline) -> list[str]:
+    """predict_proba 컬럼 순서에 대응하는 클래스 라벨을 찾는다."""
+
+    label_encoder: LabelEncoder | None = bundle.get("label_encoder")
+    if label_encoder is not None:
+        return [str(value) for value in label_encoder.classes_]
+    classes = getattr(estimator, "classes_", None)
+    if classes is not None:
+        return [str(value) for value in classes]
+    return [str(value) for value in bundle.get("target_classes", [])]
+
+
+def apply_probability_calibration(
+    bundle: dict[str, Any],
+    proba: np.ndarray,
+    proba_classes: list[str],
+) -> tuple[np.ndarray, list[str]]:
+    """저장된 one-vs-rest calibrator로 클래스 확률을 보정하고 정규화한다."""
+
+    calibration = bundle.get("probability_calibration")
+    if not calibration or "calibrators" not in calibration:
+        return proba, proba_classes
+
+    target_classes = [str(value) for value in calibration.get("classes", proba_classes)]
+    raw_lookup = {label: idx for idx, label in enumerate(proba_classes)}
+    aligned = np.zeros((len(proba), len(target_classes)), dtype=float)
+    for idx, label in enumerate(target_classes):
+        raw_idx = raw_lookup.get(label)
+        if raw_idx is not None and raw_idx < proba.shape[1]:
+            aligned[:, idx] = proba[:, raw_idx]
+
+    calibrated = np.zeros_like(aligned)
+    for idx, calibrator in enumerate(calibration["calibrators"]):
+        if calibrator is None:
+            calibrated[:, idx] = aligned[:, idx]
+        else:
+            calibrated[:, idx] = calibrator.predict(aligned[:, idx])
+
+    calibrated = np.clip(calibrated, 0.0, 1.0)
+    row_sums = calibrated.sum(axis=1)
+    valid = row_sums > 0
+    calibrated[valid] = calibrated[valid] / row_sums[valid, None]
+    calibrated[~valid] = aligned[~valid]
+    return calibrated, target_classes
+
+
+def predicted_class_confidence(
+    pred: np.ndarray,
+    proba: np.ndarray,
+    proba_classes: list[str],
+) -> np.ndarray:
+    """각 예측 라벨에 대응하는 확률 컬럼 값을 confidence로 반환한다."""
+
+    lookup = {label: idx for idx, label in enumerate(proba_classes)}
+    confidence = np.full(len(pred), np.nan)
+    for idx, label in enumerate(np.asarray(pred, dtype=str)):
+        class_idx = lookup.get(label)
+        if class_idx is None or class_idx >= proba.shape[1]:
+            confidence[idx] = float(np.nanmax(proba[idx]))
+        else:
+            confidence[idx] = float(proba[idx, class_idx])
+    return confidence
 
 
 def bearing_degrees(lat1: float, lon1: float, lat2: float, lon2: float) -> float:

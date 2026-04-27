@@ -18,6 +18,7 @@ from typing import Any
 import joblib
 import numpy as np
 import pandas as pd
+from sklearn.isotonic import IsotonicRegression
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, f1_score
 from sklearn.model_selection import GroupShuffleSplit, StratifiedGroupKFold, train_test_split
 from sklearn.preprocessing import LabelEncoder
@@ -144,6 +145,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Also run the old row-level random split to show the leakage gap.",
     )
+    parser.add_argument(
+        "--no-calibration",
+        action="store_true",
+        help="Skip isotonic calibration for predicted ship-type confidence values.",
+    )
     return parser.parse_args()
 
 
@@ -259,7 +265,7 @@ def evaluate_specs(
         metrics = fit_spec_with_predictions(spec, x_train, x_test, y_train, y_test)
         results.append(metrics)
 
-    results.sort(key=lambda item: (item["test_accuracy"], item["macro_f1"]), reverse=True)
+    results.sort(key=lambda item: (item["macro_f1"], item["test_accuracy"]), reverse=True)
     return results, skipped
 
 
@@ -421,6 +427,7 @@ def train_deploy_bundle(
     all_metrics: list[dict[str, Any]],
     skipped: dict[str, str],
     split_info: dict[str, Any],
+    probability_calibration: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """그룹 분할에서 선택된 모델을 재학습하고 저장 산출물을 만든다.
 
@@ -437,7 +444,7 @@ def train_deploy_bundle(
         raise RuntimeError(f"Could not recreate model spec: {best_metrics['model_name']}")
 
     final_estimator, final_label_encoder = refit_full(fresh_specs[0], x, y)
-    return {
+    bundle = {
         "target": TARGET,
         "model_name": best_metrics["model_name"],
         "display_name": best_metrics["display_name"],
@@ -461,6 +468,133 @@ def train_deploy_bundle(
             ),
         },
     }
+    if probability_calibration:
+        bundle["probability_calibration"] = probability_calibration
+    return bundle
+
+
+def build_probability_calibration(
+    best_metrics: dict[str, Any],
+    x_train: pd.DataFrame,
+    x_calib: pd.DataFrame,
+    y_train: pd.Series,
+    y_calib: pd.Series,
+) -> dict[str, Any] | None:
+    """그룹 홀드아웃 예측 확률을 이용해 클래스별 isotonic calibrator를 학습한다."""
+
+    categorical_cols, numeric_cols = split_columns(x_train)
+    fresh_specs, _ = model_specs(categorical_cols, numeric_cols, {best_metrics["model_name"]})
+    if not fresh_specs:
+        return None
+
+    spec = fresh_specs[0]
+    label_encoder: LabelEncoder | None = None
+    fit_y: pd.Series | np.ndarray = y_train
+    if spec.requires_label_encoding:
+        label_encoder = LabelEncoder()
+        fit_y = label_encoder.fit_transform(y_train)
+
+    spec.estimator.fit(x_train, fit_y)
+    if not hasattr(spec.estimator, "predict_proba"):
+        return None
+
+    raw_proba = np.asarray(spec.estimator.predict_proba(x_calib))
+    if label_encoder is not None:
+        class_order = [str(value) for value in label_encoder.classes_]
+    else:
+        class_order = [str(value) for value in getattr(spec.estimator, "classes_", [])]
+    if raw_proba.shape[1] != len(class_order):
+        return None
+
+    calibrators: list[IsotonicRegression | None] = []
+    calibrated = np.zeros_like(raw_proba, dtype=float)
+    for idx, label in enumerate(class_order):
+        binary_target = (y_calib.astype(str).to_numpy() == label).astype(int)
+        if binary_target.min() == binary_target.max():
+            calibrators.append(None)
+            calibrated[:, idx] = raw_proba[:, idx]
+            continue
+        calibrator = IsotonicRegression(out_of_bounds="clip")
+        calibrator.fit(raw_proba[:, idx], binary_target)
+        calibrators.append(calibrator)
+        calibrated[:, idx] = calibrator.predict(raw_proba[:, idx])
+
+    calibrated = np.clip(calibrated, 0.0, 1.0)
+    row_sums = calibrated.sum(axis=1)
+    valid = row_sums > 0
+    calibrated[valid] = calibrated[valid] / row_sums[valid, None]
+    calibrated[~valid] = raw_proba[~valid]
+
+    pred = spec.estimator.predict(x_calib)
+    if label_encoder is not None:
+        pred = label_encoder.inverse_transform(pred.astype(int))
+    before_confidence = predicted_label_confidence(pred, raw_proba, class_order)
+    after_confidence = predicted_label_confidence(pred, calibrated, class_order)
+
+    return {
+        "method": "one_vs_rest_isotonic",
+        "classes": class_order,
+        "calibrators": calibrators,
+        "calibration_rows": int(len(x_calib)),
+        "calibration_note": (
+            "Isotonic calibrators were fit on the MMSI group holdout predictions. "
+            "The deployed estimator is still refit on all rows; calibration only "
+            "adjusts reported confidence values."
+        ),
+        "ece_before": expected_calibration_error(y_calib, pred, before_confidence),
+        "ece_after": expected_calibration_error(y_calib, pred, after_confidence),
+    }
+
+
+def predicted_label_confidence(
+    pred: np.ndarray,
+    proba: np.ndarray,
+    class_order: list[str],
+) -> np.ndarray:
+    """예측 라벨에 해당하는 proba 컬럼을 confidence 벡터로 추출한다."""
+
+    lookup = {label: idx for idx, label in enumerate(class_order)}
+    confidence = np.full(len(pred), np.nan)
+    for idx, label in enumerate(np.asarray(pred, dtype=str)):
+        class_idx = lookup.get(label)
+        if class_idx is None:
+            confidence[idx] = float(np.nanmax(proba[idx]))
+        else:
+            confidence[idx] = float(proba[idx, class_idx])
+    return confidence
+
+
+def expected_calibration_error(
+    y_true: pd.Series,
+    y_pred: np.ndarray,
+    confidence: np.ndarray,
+    n_bins: int = 10,
+) -> float:
+    """예측 confidence와 실제 정답률 사이의 expected calibration error."""
+
+    y_true_arr = y_true.astype(str).to_numpy()
+    y_pred_arr = np.asarray(y_pred, dtype=str)
+    conf = np.asarray(confidence, dtype=float)
+    valid = np.isfinite(conf)
+    if not valid.any():
+        return float("nan")
+
+    y_true_arr = y_true_arr[valid]
+    y_pred_arr = y_pred_arr[valid]
+    conf = conf[valid]
+    edges = np.linspace(0.0, 1.0, n_bins + 1)
+    error = 0.0
+    for lower, upper in zip(edges[:-1], edges[1:]):
+        if upper == 1.0:
+            mask = (conf >= lower) & (conf <= upper)
+        else:
+            mask = (conf >= lower) & (conf < upper)
+        if not mask.any():
+            continue
+        accuracy = np.mean(y_true_arr[mask] == y_pred_arr[mask])
+        avg_confidence = float(np.mean(conf[mask]))
+        error += float(mask.mean()) * abs(float(accuracy) - avg_confidence)
+    return float(error)
 
 
 def main() -> None:
@@ -539,6 +673,16 @@ def main() -> None:
         encoding="utf-8-sig",
     )
 
+    probability_calibration = None
+    if not args.no_calibration:
+        probability_calibration = build_probability_calibration(
+            best_group_result,
+            x_train,
+            x_test,
+            y_train,
+            y_test,
+        )
+
     bundle = train_deploy_bundle(
         x=x,
         y=y,
@@ -546,6 +690,7 @@ def main() -> None:
         all_metrics=group_results,
         skipped=skipped,
         split_info=split_info,
+        probability_calibration=probability_calibration,
     )
     args.model_out.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(bundle, args.model_out.resolve(), compress=3)
@@ -556,6 +701,12 @@ def main() -> None:
     print(f"Saved deploy model metrics: {args.metrics_out.resolve()}")
     print(f"Saved class metrics: {args.class_metrics_out.resolve()}")
     print(f"Saved confusion pairs: {args.confusion_pairs_out.resolve()}")
+    if probability_calibration:
+        print(
+            "Calibration ECE: "
+            f"before={probability_calibration['ece_before']:.4f}, "
+            f"after={probability_calibration['ece_after']:.4f}"
+        )
     print(f"Rows: train={len(x_train):,}, test={len(x_test):,}")
     print(
         "Group leakage check: "
