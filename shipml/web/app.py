@@ -132,6 +132,8 @@ def create_app() -> Flask:
         if show_future:
             future_features = future_prediction_features(ships, load_future_predictions())
 
+        ship_features = ship_point_features(ships, latest_points)
+
         return jsonify(
             {
                 "filters": {
@@ -142,11 +144,11 @@ def create_app() -> Flask:
                     "showFuture": show_future,
                 },
                 "shipCount": int(len(predictions)),
-                "shownShipCount": int(len(ships)),
+                "shownShipCount": int(len(ship_features)),
                 "routes": feature_collection(route_features),
                 "shipTracks": feature_collection(track_features),
                 "futureTracks": feature_collection(future_features),
-                "ships": feature_collection(ship_point_features(ships, latest_points)),
+                "ships": feature_collection(ship_features),
                 "routeSummary": route_counts.to_dict("records"),
                 "bounds": dataframe_bounds(ships, centers),
             }
